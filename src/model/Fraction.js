@@ -48,7 +48,7 @@ export default class Fraction {
   }
 
   sub(f) {
-    return this.add(new Fraction(-f.num, f.den));
+    return this.add(f.opposite());
   }
 
   mult(f) {
@@ -71,5 +71,9 @@ export default class Fraction {
     if (e < 0)
       return new Fraction(Math.pow(this.den, -e), Math.pow(this.num, -e));
     return new Fraction(Math.pow(this.num, e), Math.pow(this.den, e));
+  }
+
+  opposite() {
+    return new Fraction(-this.num, this.den);
   }
 }

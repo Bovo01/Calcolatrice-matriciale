@@ -71,7 +71,7 @@ export default defineComponent({
   width: 17vw;
   margin-right: 4vw;
   font-weight: bold;
-  font-size: 4vw;
+  font-size: min(4vw, 4vh);
 }
 .row .q-btn:last-child {
   margin-right: 0vw;
