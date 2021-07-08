@@ -7,8 +7,9 @@ export default class Matrix {
     if (matrix) {
       if (matrix.length !== rows) throw "La dimensione della matrice non corrisponde alle righe e alle colonne inserite";
       for (let i = 0; i < matrix.length; i++) {
-        if (matrix[i].length !== rows) throw "La dimensione della matrice non corrisponde alle righe e alle colonne inserite";
-        if (!(matrix[i][j] instanceof Fraction)) throw "La matrice deve contenere oggetti di tipo Fraction";
+        if (matrix[i].length !== cols) throw "La dimensione della matrice non corrisponde alle righe e alle colonne inserite";
+        for (let j = 0; j < cols; j++)
+          if (!(matrix[i][j] instanceof Fraction)) throw "La matrice deve contenere oggetti di tipo Fraction";
       }
       this.matrix = matrix;
     } else {
@@ -19,15 +20,17 @@ export default class Matrix {
           this.matrix[i][j] = new Fraction(0);
       }
     }
+    this.rows = rows;
+    this.cols = cols;
   }
 
   add(m) {
-    if (rows !== m.rows || cols !== m.cols) throw "Le dimensioni delle matrici devono essere uguali";
-    let tempM = new Matrix(rows, cols, this.matrix);
-    for (let i = 0; i < rows; i++)
-      for (let j = 0; j < cols; j++)
-        tempM.matrix[i][j] = tempM.matrix[i][j].add(m.matrix[i][j]);
-    return tempM;
+    if (this.rows !== m.rows || this.cols !== m.cols) throw "Le dimensioni delle matrici devono essere uguali";
+    let tempM = this.matrix;
+    for (let i = 0; i < this.rows; i++)
+      for (let j = 0; j < this.cols; j++)
+        tempM[i][j] = tempM[i][j].add(m.matrix[i][j]);
+    return new Matrix(this.rows, this.cols, tempM);
   }
 
   sub(m) {
@@ -37,9 +40,27 @@ export default class Matrix {
   multPerScalare(s) {
     if (!(s instanceof Fraction))
       if (isNaN(s) || s !== parseInt(s)) throw "Lo scalare deve essere un oggetto di tipo Fraction o un numero intero";
+    let tempM = this._createMatrix(this.rows);
+    for (let i = 0; i < this.rows; i++)
+      for (let j = 0; j < this.cols; j++)
+        tempM[i][j] = this.matrix[i][j].mult(s);
+    return new Matrix(this.rows, this.cols, tempM);
+  }
+
+  transposition() {
+    let tempMatrix = this._createMatrix(this.cols);
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        tempMatrix[j][i] = this.matrix[i][j];
+      }
+    }
+    return new Matrix(this.cols, this.rows, tempMatrix);
+  }
+
+  _createMatrix(rows) {
+    let temp = [];
     for (let i = 0; i < rows; i++)
-      for (let j = 0; j < cols; j++)
-        this.matrix[i][j] = this.matrix[i][j].mult(s);
-    return tempM;
+      temp[i] = [];
+    return temp;
   }
 }

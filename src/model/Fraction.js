@@ -10,6 +10,10 @@ export default class Fraction {
   }
 
   _riduzioneMinimiTermini() {
+    if (this.num === 0) {
+      this.den = 1;
+      return;
+    }
     if (this.den < 0) {
       this.num *= -1;
       this.den *= -1;
@@ -39,20 +43,30 @@ export default class Fraction {
     a = Math.abs(a);
     b = Math.abs(b);
     let mcd = this._MCD(a, b);
-    return (a / mcd) * (b / mcd);
+    return (a / mcd) * (b / mcd) * mcd;
   }
 
   add(f) {
-    let mcm = this._mcm(this.den, f.den);
-    return new Fraction(this.num * (mcm / this.den) + f.num * (mcm / f.den), mcm);
+    if (f instanceof Fraction) {
+      let mcm = this._mcm(this.den, f.den);
+      return new Fraction(this.num * (mcm / this.den) + f.num * (mcm / f.den), mcm);
+    }
+    if (isNaN(f) || f !== parseInt(f)) throw "L'elemento da sommare deve essere un numero intero o un oggetto di tipo Fraction";
+    return new Fraction(this.num + parseInt(f) * this.den, this.den)
   }
 
   sub(f) {
-    return this.add(f.opposite());
+    if (f instanceof Fraction)
+      return this.add(f.opposite());
+    if (isNaN(f) || f !== parseInt(f)) throw "L'elemento da sottrarre deve essere un numero intero o un oggetto di tipo Fraction";
+    return this.add(-parseInt(f));
   }
 
   mult(f) {
-    return new Fraction(this.num * f.num, this.den * f.den);
+    if (f instanceof Fraction)
+      return new Fraction(this.num * f.num, this.den * f.den);
+    if (isNaN(f) || f !== parseInt(f)) throw "L'elemento da moltiplicare deve essere un numero intero o un oggetto di tipo Fraction";
+    return new Fraction(this.num * parseInt(f), this.den);
   }
 
   div(f) {
