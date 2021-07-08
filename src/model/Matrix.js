@@ -49,6 +49,31 @@ export default class Matrix {
     this.matrix[r2] = temp;
   }
 
+  _multPerMatrice(mat) {
+    if (this.cols !== mat.rows) throw "Per il prodotto matriciale le colonne della prima matrice devono essere uguali alle righe della seconda";
+    let matProdotto = this._createMatrix(this.rows, mat.cols);
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < mat.cols; j++) {
+        let sum = new Fraction(0);
+        for (let k = 0; k < this.cols; k++) {
+          sum = sum.add(this.matrix[i][k].mult(mat.matrix[k][j]));
+        }
+        matProdotto[i][j] = sum;
+      }
+    }
+    return new Matrix(this.rows, mat.cols, matProdotto);
+  }
+
+  _multPerScalare(s) {
+    if (!(s instanceof Fraction))
+      if (isNaN(s) || s !== parseInt(s)) throw "Lo scalare deve essere un oggetto di tipo Fraction o un numero intero";
+    let tempM = this._createMatrix(this.rows);
+    for (let i = 0; i < this.rows; i++)
+      for (let j = 0; j < this.cols; j++)
+        tempM[i][j] = this.matrix[i][j].mult(s);
+    return new Matrix(this.rows, this.cols, tempM);
+  }
+
   add(m) {
     if (this.rows !== m.rows || this.cols !== m.cols) throw "Le dimensioni delle matrici devono essere uguali";
     let tempM = this.matrix;
@@ -59,17 +84,7 @@ export default class Matrix {
   }
 
   sub(m) {
-    return this.add(m.multPerScalare(-1));
-  }
-
-  multPerScalare(s) {
-    if (!(s instanceof Fraction))
-      if (isNaN(s) || s !== parseInt(s)) throw "Lo scalare deve essere un oggetto di tipo Fraction o un numero intero";
-    let tempM = this._createMatrix(this.rows);
-    for (let i = 0; i < this.rows; i++)
-      for (let j = 0; j < this.cols; j++)
-        tempM[i][j] = this.matrix[i][j].mult(s);
-    return new Matrix(this.rows, this.cols, tempM);
+    return this.add(m._multPerScalare(-1));
   }
 
   transposition() {
@@ -129,6 +144,13 @@ export default class Matrix {
       }
     }
     return rango;
+  }
+
+  mult(x) {
+    if (x instanceof Matrix)
+      return this._multPerMatrice(x);
+    else
+      return this._multPerScalare(x);
   }
 
   equals(m) {

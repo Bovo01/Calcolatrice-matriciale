@@ -22,9 +22,13 @@ export default defineComponent({
       [3, 8, -5],
     ]);
 
-    console.log(m);
-    console.log(m.riduzioneScala());
-    console.log(m.rango());
+    let m2 = new Matrix(3, 3, [
+      [0, 1, 0],
+      [0, 1, 1],
+      [0, 0, -1],
+    ]);
+    
+    
   },
 });
 </script>
