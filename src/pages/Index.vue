@@ -16,13 +16,15 @@ export default defineComponent({
     Calculator,
   },
   mounted() {
-    let f1 = new Fraction(2, 3);
-    let f2 = new Fraction(3, 2);
-    let mat = [];
-    let m = new Matrix(1, 2, [[f1, f2]]);
-    console.log(m.multPerScalare(new Fraction(3, 5)));
-    console.log(m.multPerScalare(new Fraction(3, 5)).transposition());
-    console.log(m.sub(m));
+    let m = new Matrix(3, 3, [
+      [2, 4, -2],
+      [1, 3, -2],
+      [3, 8, -5],
+    ]);
+
+    console.log(m);
+    console.log(m.riduzioneScala());
+    console.log(m.rango());
   },
 });
 </script>

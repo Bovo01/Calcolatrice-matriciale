@@ -8,8 +8,12 @@ export default class Matrix {
       if (matrix.length !== rows) throw "La dimensione della matrice non corrisponde alle righe e alle colonne inserite";
       for (let i = 0; i < matrix.length; i++) {
         if (matrix[i].length !== cols) throw "La dimensione della matrice non corrisponde alle righe e alle colonne inserite";
-        for (let j = 0; j < cols; j++)
-          if (!(matrix[i][j] instanceof Fraction)) throw "La matrice deve contenere oggetti di tipo Fraction";
+        for (let j = 0; j < cols; j++) {
+          if (!(matrix[i][j] instanceof Fraction)) {
+            if (isNaN(matrix[i][j]) || matrix[i][j] !== parseInt(matrix[i][j])) throw "La matrice deve contenere oggetti di tipo Fraction o numeri interi";
+            matrix[i][j] = new Fraction(parseInt(matrix[i][j]));
+          }
+        }
       }
       this.matrix = matrix;
     } else {
@@ -22,6 +26,27 @@ export default class Matrix {
     }
     this.rows = rows;
     this.cols = cols;
+  }
+
+  _createMatrix(rows) {
+    let temp = [];
+    for (let i = 0; i < rows; i++)
+      temp[i] = [];
+    return temp;
+  }
+
+  _copyMatrix() {
+    let newMat = this._createMatrix();
+    for (let i = 0; i < this.rows; i++) {
+      newMat[i] = [...this.matrix[i]];
+    }
+    return newMat;
+  }
+
+  _invertiRighe(r1, r2) {
+    let temp = this.matrix[r1];
+    this.matrix[r1] = this.matrix[r2];
+    this.matrix[r2] = temp;
   }
 
   add(m) {
@@ -57,10 +82,62 @@ export default class Matrix {
     return new Matrix(this.cols, this.rows, tempMatrix);
   }
 
-  _createMatrix(rows) {
-    let temp = [];
-    for (let i = 0; i < rows; i++)
-      temp[i] = [];
-    return temp;
+  riduzioneScala() {
+    let newMat = new Matrix(this.rows, this.cols, this._copyMatrix());
+    // Indica la riga del pivot
+    let c = 0;
+    for (let j = 0; j < this.cols && c < this.rows; j++) {
+      // Se c'è uno 0 come pivot sposto la riga con una successiva che non abbia 0
+      if (newMat.matrix[c][j].equals(0)) {
+        let done = false;
+        for (let i = c; i < this.rows; i++) {
+          if (!newMat.matrix[i][j].equals(0)) {
+            newMat._invertiRighe(i, j);
+            done = true;
+            break;
+          }
+        }
+        if (!done) {
+          continue;
+        }
+      }
+      // Faccio i calcoli su una combinazione lineare
+      for (let i = c + 1; i < this.rows; i++) {
+        if (!newMat.matrix[i][j].equals(0)) {
+          let divider = newMat.matrix[i][j].div(newMat.matrix[c][j]).opposite();
+          for (let j2 = j; j2 < this.rows; j2++) {
+            newMat.matrix[i][j2] = newMat.matrix[c][j2].mult(divider).add(newMat.matrix[i][j2]);
+          }
+        }
+      }
+
+      c++;
+    }
+
+    return newMat;
+  }
+
+  rango() {
+    let matrScala = this.riduzioneScala();
+    let rango = 0;
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        if (!matrScala.matrix[i][j].equals(0)) {
+          rango++;
+          break;
+        }
+      }
+    }
+    return rango;
+  }
+
+  equals(m) {
+    if (this.rows !== m.rows || this.cols !== m.cols) return false;
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        if (!newMat.matrix[i][j].equals(m.matrix[i][j])) return false;
+      }
+    }
+    return true;
   }
 }

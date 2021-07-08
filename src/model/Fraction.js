@@ -90,4 +90,16 @@ export default class Fraction {
   opposite() {
     return new Fraction(-this.num, this.den);
   }
+
+  equals(f) {
+    if (f instanceof Fraction)
+      return this.num === f.num && this.den === f.den;
+    if (isNaN(f) || f !== parseInt(f)) throw "Il numero con cui si può paragonare la frazione deve essere un oggetto di tipo Fraction o un numero intero";
+    if (this.den !== 1) return false;
+    return this.num === f;
+  }
+
+  toString() {
+    return `${this.num}/${this.den}`;
+  }
 }
