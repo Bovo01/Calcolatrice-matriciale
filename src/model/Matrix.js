@@ -28,7 +28,7 @@ export default class Matrix {
     this.cols = cols;
   }
 
-  _createMatrix(rows) {
+  _createMatrix(rows = this.rows) {
     let temp = [];
     for (let i = 0; i < rows; i++)
       temp[i] = [];
@@ -51,7 +51,7 @@ export default class Matrix {
 
   _multPerMatrice(mat) {
     if (this.cols !== mat.rows) throw "Per il prodotto matriciale le colonne della prima matrice devono essere uguali alle righe della seconda";
-    let matProdotto = this._createMatrix(this.rows, mat.cols);
+    let matProdotto = this._createMatrix();
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < mat.cols; j++) {
         let sum = new Fraction(0);
@@ -67,11 +67,34 @@ export default class Matrix {
   _multPerScalare(s) {
     if (!(s instanceof Fraction))
       if (isNaN(s) || s !== parseInt(s)) throw "Lo scalare deve essere un oggetto di tipo Fraction o un numero intero";
-    let tempM = this._createMatrix(this.rows);
+    let tempM = this._createMatrix();
     for (let i = 0; i < this.rows; i++)
       for (let j = 0; j < this.cols; j++)
         tempM[i][j] = this.matrix[i][j].mult(s);
     return new Matrix(this.rows, this.cols, tempM);
+  }
+
+  /**
+   * Restituisce una nuova matrice con una riga e una colonna eliminate relativamente alla matrice inserita, che non viene modificata
+   * 
+   * @param {Array} mat Matrice
+   * @param {Number} i Indice di riga da eliminare
+   * @param {Number} j Indice di colonna da eliminare
+   */
+  _eliminaRigaColonna(mat, i, j) {
+    let newMat = this._createMatrix(this.rows - 1);
+    let i1 = 0
+    for (let k = 0; k < this.rows; k++) {
+      if (k === i) continue;
+      let j1 = 0;
+      for (let c = 0; c < this.cols; c++) {
+        if (c === j) continue;
+        newMat[i1][j1] = mat[k][c];
+        j1++;
+      }
+      i1++;
+    }
+    return newMat;
   }
 
   add(m) {
@@ -153,6 +176,40 @@ export default class Matrix {
       return this._multPerScalare(x);
   }
 
+  /**
+   * Calcolo il determinante con il metodo di Laplace implementato ricorsivamente
+   */
+  det() {
+    if (this.rows !== this.cols) throw "Impossibile calcolare il determinante in una matrice non quadrata";
+    // Caso base
+    if (this.rows === 1) return this.matrix[0][0];
+    // Ricorsione
+    let sum = new Fraction(0);
+    for (let i = 0; i < this.rows; i++) {
+      sum = sum.add(
+        this.matrix[i][0]
+        .mult(Math.pow(-1, i))
+        .mult(new Matrix(this.rows - 1, this.cols - 1, this._eliminaRigaColonna(this.matrix, i, 0)).det())
+      );
+    }
+    return sum;
+  }
+
+  inversa() {
+    if (this.rows !== this.cols) throw "Impossibile trovare la matrice inversa di una matrice non quadrata"
+    let det = this.det();
+    if (det.equals(0)) throw "Impossibile calcolare la matrice inversa quando il determinante è uguale a zero";
+    let newMat = this._createMatrix();
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        newMat[i][j] =
+          new Matrix(this.rows - 1, this.cols - 1, this._eliminaRigaColonna(this.matrix, i, j)).det()
+          .mult(Math.pow(-1, i + j));
+      }
+    }
+    return new Matrix(this.rows, this.cols, newMat).transposition().mult(det.reciprocal());
+  }
+
   equals(m) {
     if (this.rows !== m.rows || this.cols !== m.cols) return false;
     for (let i = 0; i < this.rows; i++) {
@@ -161,5 +218,16 @@ export default class Matrix {
       }
     }
     return true;
+  }
+
+  toString() {
+    let s = "";
+    for (let i = 0; i < this.rows; i++) {
+      for (let j = 0; j < this.cols; j++) {
+        s += `${this.matrix[i][j]}\t`;
+      }
+      s += '\n';
+    }
+    return s;
   }
 }
