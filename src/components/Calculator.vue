@@ -6,6 +6,9 @@
     </div>
     <!-- Bottoni -->
     <div>
+      <div class="row no-wrap">
+        <q-btn @click="backspace()" icon="fas fa-backspace" />
+      </div>
       <!-- Prima riga (vars,ops,view mat,/) -->
       <div class="row no-wrap">
         <q-btn>VARS</q-btn>
@@ -39,7 +42,7 @@
         <q-btn @click="clear()" icon="fas fa-trash" />
         <q-btn @click="appendText(0)">0</q-btn>
         <q-btn @click="backspace()" icon="fas fa-backspace" />
-        <q-btn icon="fas fa-equals" />
+        <q-btn @click="solve()" icon="fas fa-equals" />
       </div>
     </div>
   </div>
@@ -47,6 +50,7 @@
 
 <script>
 import { defineComponent } from "vue";
+import { toRPN } from "src/model/calculator.js";
 
 export default defineComponent({
   name: "Calculator",
@@ -70,7 +74,6 @@ export default defineComponent({
             parseInt(lastOperation + text)
           );
       } else this.operations.push(text);
-      console.log(this.operations);
     },
     clear() {
       this.operations = [];
@@ -85,6 +88,9 @@ export default defineComponent({
           lastOperation.length - 1
         );
       }
+    },
+    solve() {
+      console.log(toRPN(this.operations));
     },
   },
 });
