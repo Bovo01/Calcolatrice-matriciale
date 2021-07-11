@@ -54,7 +54,7 @@ const isLeftAssociative = function (op) {
   return op != '^';
 }
 
-export function toRPN(arr) {
+const toRPN = function (arr) {
   let outputStack = [];
   let operatorStack = [];
   for (let token of arr) {
@@ -98,3 +98,9 @@ export function toRPN(arr) {
 
   return outputStack;
 }
+
+export {
+  isFunction,
+  isOperator,
+  toRPN,
+};

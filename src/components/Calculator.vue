@@ -6,42 +6,61 @@
     </div>
     <!-- Bottoni -->
     <div>
+      <!-- Prima riga (vars,ops,view mat,^) -->
       <div class="row no-wrap">
-        <q-btn @click="backspace()" icon="fas fa-backspace" />
-      </div>
-      <!-- Prima riga (vars,ops,view mat,/) -->
-      <div class="row no-wrap">
-        <q-btn>VARS</q-btn>
+        <q-btn-dropdown label="VARS">
+          <q-list>
+            <q-item clickable v-close-popup @click="appendText">
+              <q-item-section>
+                <q-item-label
+                  v-for="(matrix, index) in matrixes"
+                  v-bind:key="index"
+                  @click=""
+                >
+                  {{ matrix.name }}
+                </q-item-label>
+                <q-item-label>Add mat</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
         <q-btn>OPS</q-btn>
         <q-btn>VIEW MAT</q-btn>
+        <q-btn @click="appendText('^')">^</q-btn>
+      </div>
+      <!-- Seconda riga (trash,,backspace,/) -->
+      <div class="row no-wrap">
+        <q-btn @click="clear()" icon="fas fa-trash" />
+        <q-btn />
+        <q-btn @click="backspace()" icon="fas fa-backspace" />
         <q-btn @click="appendText('/')" icon="fas fa-divide" />
       </div>
-      <!-- Seconda riga (7,8,9,*) -->
+      <!-- Terza riga (7,8,9,*) -->
       <div class="row no-wrap">
         <q-btn @click="appendText(7)">7</q-btn>
         <q-btn @click="appendText(8)">8</q-btn>
         <q-btn @click="appendText(9)">9</q-btn>
         <q-btn @click="appendText('*')" icon="fas fa-times" />
       </div>
-      <!-- Terza riga (4,5,6,-) -->
+      <!-- Quarta riga (4,5,6,-) -->
       <div class="row no-wrap">
         <q-btn @click="appendText(4)">4</q-btn>
         <q-btn @click="appendText(5)">5</q-btn>
         <q-btn @click="appendText(6)">6</q-btn>
         <q-btn @click="appendText('-')" icon="fas fa-minus" />
       </div>
-      <!-- Quarta riga (1,2,3,+) -->
+      <!-- Quinta riga (1,2,3,+) -->
       <div class="row no-wrap">
         <q-btn @click="appendText(1)">1</q-btn>
         <q-btn @click="appendText(2)">2</q-btn>
         <q-btn @click="appendText(3)">3</q-btn>
         <q-btn @click="appendText('+')" icon="fas fa-plus" />
       </div>
-      <!-- Quinta riga (c,0,<=,=) -->
+      <!-- Sesta riga ((,0,),=) -->
       <div class="row no-wrap">
-        <q-btn @click="clear()" icon="fas fa-trash" />
+        <q-btn @click="appendText('(')">(</q-btn>
         <q-btn @click="appendText(0)">0</q-btn>
-        <q-btn @click="backspace()" icon="fas fa-backspace" />
+        <q-btn @click="appendText(')')">)</q-btn>
         <q-btn @click="solve()" icon="fas fa-equals" />
       </div>
     </div>
@@ -50,18 +69,22 @@
 
 <script>
 import { defineComponent } from "vue";
-import { toRPN } from "src/model/calculator.js";
+import { toRPN, isFunction, isOperator } from "src/model/calculator.js";
 
 export default defineComponent({
   name: "Calculator",
   data() {
     return {
       operations: [],
+      parenthesis: 0,
     };
   },
   computed: {
     text: function () {
       return this.operations.join("");
+    },
+    matrixes: function () {
+      return this.$store.getters.matrixes;
     },
   },
   methods: {
@@ -73,7 +96,26 @@ export default defineComponent({
           this.operations[this.operations.length - 1] = String(
             parseInt(lastOperation + text)
           );
-      } else this.operations.push(text);
+      } else if (isFunction(text)) {
+        this.operations.push(text);
+        this.operations.push("(");
+        this.parenthesis++;
+      } else if (isOperator(text)) {
+        if (isOperator(lastOperation))
+          this.operations[this.operations.length - 1] = text;
+        else if (lastOperation != "(" && this.operations.length > 0)
+          this.operations.push(text);
+      } else if (text == "(") {
+        this.operations.push(text);
+        this.parenthesis++;
+      } else if (text == ")") {
+        if (this.parenthesis > 0 && lastOperation != "(") {
+          this.operations.push(text);
+          this.parenthesis--;
+        }
+      } else {
+        this.operations.push(text);
+      }
     },
     clear() {
       this.operations = [];
@@ -92,6 +134,7 @@ export default defineComponent({
     solve() {
       console.log(toRPN(this.operations));
     },
+    addMatrix() {},
   },
 });
 </script>
@@ -116,13 +159,17 @@ export default defineComponent({
   margin-top: 3vh;
 }
 .row .q-btn {
-  height: 11vh;
+  height: 8.6vh;
   width: 17vw;
   margin-right: 4vw;
   font-weight: bold;
-  font-size: min(4vw, 4vh);
+  font-size: min(3vw, 3vh);
 }
 .row .q-btn:last-child {
   margin-right: 0vw;
+}
+.q-item {
+  margin-top: 0;
+  font-size: min(3vw, 3vh);
 }
 </style>
