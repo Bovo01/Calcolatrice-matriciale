@@ -1,3 +1,5 @@
+import Fraction from 'src/model/Fraction.js';
+
 const isFunction = function (token) {
   switch (token) {
     // Elenco delle funzioni
@@ -59,9 +61,9 @@ const toRPN = function (arr) {
   let operatorStack = [];
   for (let token of arr) {
     let lastOperatorStack = operatorStack[operatorStack.length - 1];
-    if (!isNaN(token)) {
-      // Se è un numero
-      outputStack.push(parseInt(token));
+    if (token instanceof Fraction) {
+      // Se è una frazione
+      outputStack.push(token);
     } else if (isFunction(token)) {
       // Se è una funzione
       operatorStack.push(token);
@@ -99,8 +101,39 @@ const toRPN = function (arr) {
   return outputStack;
 }
 
+const resolveRPN = function (rpn) {
+  let stack = [];
+  for (let elem of rpn) {
+    if (isOperator(elem)) {
+      stack.push(
+        resolveBasicOperation(stack.pop(), stack.pop(), elem)
+      );
+    } else if (isFunction(elem)) {} else
+      stack.push(elem);
+  }
+  return stack.pop();
+}
+
+const resolveBasicOperation = function (n1, n2, op) {
+  switch (op) {
+    case '*':
+      return n1.mult(n2);
+    case '/':
+      return n2.div(n1);
+    case '+':
+      return n1.add(n2);
+    case '-':
+      return n2.sub(n1);
+    case '^':
+      return n2.pow(n1);
+    default:
+      throw "Operatore non valido";
+  }
+}
+
 export {
   isFunction,
   isOperator,
   toRPN,
+  resolveRPN,
 };

@@ -5,6 +5,7 @@ const routes = [{
 
   {
     path: '/add-matrix',
+    name: "Aggiungi matrice",
     component: () => import('src/pages/AddMatrix.vue'),
   },
 

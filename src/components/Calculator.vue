@@ -10,7 +10,7 @@
       <div class="row no-wrap">
         <q-btn-dropdown label="VARS">
           <q-list>
-            <q-item clickable v-close-popup @click="appendText">
+            <q-item clickable v-close-popup>
               <q-item-section>
                 <q-item-label
                   v-for="(matrix, index) in matrixes"
@@ -19,7 +19,7 @@
                 >
                   {{ matrix.name }}
                 </q-item-label>
-                <q-item-label>Add mat</q-item-label>
+                <q-item-label @click="addMatrix()">Add mat</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -69,7 +69,13 @@
 
 <script>
 import { defineComponent } from "vue";
-import { toRPN, isFunction, isOperator } from "src/model/calculator.js";
+import {
+  isFunction,
+  isOperator,
+  toRPN,
+  resolveRPN,
+} from "src/model/calculator.js";
+import Fraction from "src/model/Fraction.js";
 
 export default defineComponent({
   name: "Calculator",
@@ -138,14 +144,30 @@ export default defineComponent({
       }
     },
     solve() {
-      console.log(toRPN(this.operations));
+      // Converto i numeri in frazioni
+      let operations = [];
+      for (let i = 0; i < this.operations.length; i++) {
+        if (!isNaN(this.operations[i])) {
+          operations.push(new Fraction(this.operations[i]));
+        } else operations.push(this.operations[i]);
+      }
+      this.$q.notify({
+        message: resolveRPN(toRPN(operations)).toString(),
+        position: "top",
+        color: "green",
+      });
     },
     addMatrix() {
-      this.$route.push({ name: "" });
+      this.$router.push({ name: "Aggiungi matrice" });
     },
     toggleTheme() {
       this.theme = (this.theme + 1) % this.qtyThemes;
     },
+  },
+  mounted() {
+    this.operations.push(3);
+    this.operations.push("*");
+    this.operations.push(7);
   },
 });
 </script>
