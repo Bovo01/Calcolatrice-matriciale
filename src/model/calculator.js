@@ -76,7 +76,7 @@ const toRPN = function (arr) {
       }
       operatorStack.push(token);
     } else if (token == '(') {
-      outputStack.push(token);
+      operatorStack.push(token);
     } else if (token == ')') {
       while (operatorStack.length && operatorStack[operatorStack.length - 1] != '(') {
         if (operatorStack.length <= 0) throw "Errore di parentesi, idiota";

@@ -15,7 +15,7 @@
                 <q-item-label
                   v-for="(matrix, index) in matrixes"
                   v-bind:key="index"
-                  @click=""
+                  @click="appendMatrix(matrix)"
                 >
                   {{ matrix.name }}
                 </q-item-label>
@@ -116,6 +116,10 @@ export default defineComponent({
       } else {
         this.operations.push(text);
       }
+    },
+    appendMatrix(matrix) {
+      let lastOperation = this.operations[this.operations.length - 1];
+      if (!isNaN(lastOperation)) return;
     },
     clear() {
       this.operations = [];
