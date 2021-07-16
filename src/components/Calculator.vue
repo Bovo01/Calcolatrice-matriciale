@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" :class="{ bubah: theme == 1 }">
     <!-- Display -->
     <div class="row">
       <input class="display" v-model="text" readonly />
@@ -28,10 +28,10 @@
         <q-btn>VIEW MAT</q-btn>
         <q-btn @click="appendText('^')">^</q-btn>
       </div>
-      <!-- Seconda riga (trash,,backspace,/) -->
+      <!-- Seconda riga (trash,BUBAH,backspace,/) -->
       <div class="row no-wrap">
         <q-btn @click="clear()" icon="fas fa-trash" />
-        <q-btn />
+        <q-btn @click="toggleTheme()">THEME</q-btn>
         <q-btn @click="backspace()" icon="fas fa-backspace" />
         <q-btn @click="appendText('/')" icon="fas fa-divide" />
       </div>
@@ -77,6 +77,8 @@ export default defineComponent({
     return {
       operations: [],
       parenthesis: 0,
+      theme: 0,
+      qtyThemes: 2,
     };
   },
   computed: {
@@ -138,12 +140,22 @@ export default defineComponent({
     solve() {
       console.log(toRPN(this.operations));
     },
-    addMatrix() {},
+    addMatrix() {
+      this.$route.push({ name: "" });
+    },
+    toggleTheme() {
+      this.theme = (this.theme + 1) % this.qtyThemes;
+    },
   },
 });
 </script>
 
 <style scoped>
+.bubah {
+  background-image: url("src/assets/Bubah.jpeg");
+  background-size: cover;
+}
+
 .container {
   margin-top: 5vh;
   margin-left: 10vw;
