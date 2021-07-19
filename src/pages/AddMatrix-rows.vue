@@ -1,27 +1,45 @@
 <template>
   <div class="container">
     <!-- Display con la matrice -->
-    <div></div>
+    <div>
+      <!-- Intestazione -->
+      <h6 class="text-h6">Riga n. {{ currentRow + 1 }}</h6>
+      <!-- Elementi riga -->
+      <div class="row no-wrap display-row">
+        <input
+          readonly
+          v-for="(fraction, index) in matrix[currentRow]"
+          :key="index"
+          :value="index == currentCol ? currentNumber.join('') : fraction.toString()"
+          class="matrix-element"
+          :class="{ selected: index == currentCol }"
+          :style="{ transform: cols > 3 && currentCol >= 2 ? `translate(${137.5 - 112.5 * currentCol}%)` : '' }"
+        />
+      </div>
+    </div>
     <!-- Tastierino numerico -->
     <div>
+      <!-- Prima riga (7,8,9) -->
       <div class="row no-wrap">
-        <q-btn @click="appendText(7)">7</q-btn>
-        <q-btn @click="appendText(8)">8</q-btn>
-        <q-btn @click="appendText(9)">9</q-btn>
+        <q-btn @click="appendText('7')">7</q-btn>
+        <q-btn @click="appendText('8')">8</q-btn>
+        <q-btn @click="appendText('9')">9</q-btn>
+        <q-btn @click="backspace()" icon="fas fa-backspace" />
       </div>
-      <!-- Quarta riga (4,5,6,-) -->
+      <!-- Seconda riga (4,5,6,/) -->
       <div class="row no-wrap">
-        <q-btn @click="appendText(4)">4</q-btn>
-        <q-btn @click="appendText(5)">5</q-btn>
-        <q-btn @click="appendText(6)">6</q-btn>
+        <q-btn @click="appendText('4')">4</q-btn>
+        <q-btn @click="appendText('5')">5</q-btn>
+        <q-btn @click="appendText('6')">6</q-btn>
+        <q-btn @click="setFraction()">/</q-btn>
       </div>
-      <!-- Quinta riga (1,2,3,+) -->
+      <!-- Terza riga (1,2,3) -->
       <div class="row no-wrap">
-        <q-btn @click="appendText(1)">1</q-btn>
-        <q-btn @click="appendText(2)">2</q-btn>
-        <q-btn @click="appendText(3)">3</q-btn>
+        <q-btn @click="appendText('1')">1</q-btn>
+        <q-btn @click="appendText('2')">2</q-btn>
+        <q-btn @click="appendText('3')">3</q-btn>
       </div>
-      <!-- Sesta riga ((,0,),=) -->
+      <!-- Quarta riga (PREV,0,NEXT) -->
       <div class="row no-wrap">
         <q-btn @click="prev()" :disable="currentRow == 0 && currentCol == 0">
           PREV
@@ -40,6 +58,8 @@
 
 <script>
 import { defineComponent } from "@vue/composition-api";
+import { errorDialog } from "src/model/Utilities.js";
+import Fraction from "src/model/Fraction.js";
 
 export default defineComponent({
   data() {
@@ -48,24 +68,91 @@ export default defineComponent({
       cols: Number,
       currentRow: 0,
       currentCol: 0,
+      currentNumber: [0],
       matrix: [],
     };
   },
   methods: {
     initializeMatrix() {
       this.matrix = [];
-      for (let i = 0; i < this.rows; i++) this.matrix[i] = [];
+      for (let i = 0; i < this.rows; i++) {
+        this.matrix[i] = [];
+        for (let j = 0; j < this.cols; j++) {
+          this.matrix[i][j] = new Fraction(0);
+        }
+      }
     },
     prev() {
-      this.currentCol = Math.abs(this.currentCol - 1) % this.cols;
-      if (this.currentCol == this.cols - 1) this.currentRow--;
+      try {
+        this.pushInMatrix();
+        this.currentCol = (this.cols + this.currentCol - 1) % this.cols;
+        if (this.currentCol == this.cols - 1) this.currentRow--;
+        this.getFromMatrix();
+      } catch (e) {
+        errorDialog(this, e);
+      }
     },
     next() {
-      this.currentCol = (this.currentCol + 1) % this.cols;
-      if (this.currentCol == 0) this.currentRow++;
+      try {
+        this.pushInMatrix();
+        this.currentCol = (this.currentCol + 1) % this.cols;
+        if (this.currentCol == 0) this.currentRow++;
+        this.getFromMatrix();
+      } catch (e) {
+        errorDialog(this, e);
+      }
+    },
+    pushInMatrix() {
+      if (this.currentNumber.length == 1) {
+        this.matrix[this.currentRow][this.currentCol] = new Fraction(
+          this.currentNumber[0]
+        );
+      } else if (this.currentNumber.length == 3) {
+        this.matrix[this.currentRow][this.currentCol] = new Fraction(
+          this.currentNumber[0],
+          this.currentNumber[2]
+        );
+      } else throw "Il numero inserito non è valido";
+    },
+    getFromMatrix() {
+      this.currentNumber = [];
+      let fraction = this.matrix[this.currentRow][this.currentCol];
+      if (fraction instanceof Fraction) {
+        this.currentNumber.push(String(fraction.num));
+        if (fraction.den != 1) {
+          this.currentNumber.push("/");
+          this.currentNumber.push(String(fraction.den));
+        }
+      }
+    },
+    backspace() {
+      if (this.currentNumber.length > 0) {
+        let riduzione = this.currentNumber[
+          this.currentNumber.length - 1
+        ].substring(
+          0,
+          this.currentNumber[this.currentNumber.length - 1].length - 1
+        );
+        if (riduzione.length == 0) this.currentNumber.pop();
+        else this.currentNumber[this.currentNumber.length - 1] = riduzione;
+      }
+    },
+    appendText(n) {
+      if (isNaN(this.currentNumber[this.currentNumber.length - 1]))
+        this.currentNumber.push(n);
+      else if (this.currentNumber[this.currentNumber.length - 1].length < 16)
+        this.currentNumber[this.currentNumber.length - 1] += n;
+    },
+    setFraction() {
+      if (
+        this.currentNumber.length > 1 ||
+        isNaN(this.currentNumber[this.currentNumber.length - 1])
+      )
+        return;
+      this.currentNumber.push("/");
     },
   },
-  created() {
+  mounted() {
     this.rows = this.$route.params.rows;
     this.cols = this.$route.params.cols;
     if (this.rows < 0 || this.cols < 0) {
@@ -90,5 +177,35 @@ export default defineComponent({
 }
 .row.row.no-wrap .q-btn:last-child {
   margin-right: 0vw;
+}
+.display-row {
+  border: 1px solid rgb(173, 173, 173);
+  height: 15vh;
+  margin-top: 5vh;
+  margin-bottom: 5vh;
+  padding-top: 2.5vh;
+  padding-bottom: 2.5vh;
+  border-radius: 7px;
+  overflow: hidden;
+  flex-flow: column wrap;
+}
+.matrix-element {
+  outline-width: 0 !important;
+  border: 2px solid black;
+  border-radius: 7px;
+  height: 10vh;
+  margin-left: 2.5vw;
+  width: 20vw;
+  cursor: default;
+  font-size: min(3vw, 3vh);
+  text-align: center;
+  z-index: -1;
+  transition-duration: 600ms;
+}
+.selected {
+  background-color: yellow;
+}
+.container {
+  display: block
 }
 </style>
