@@ -1,6 +1,12 @@
 const routes = [{
+    name: 'calculator',
     path: '/',
-    component: () => import('src/pages/Index.vue'),
+    component: () => import('src/pages/Calculator.vue'),
+  },
+  {
+    name: 'add-matrix',
+    path: '/add-matrix',
+    component: () => import('src/pages/AddMatrix.vue'),
   },
 
   // Always leave this as last one,

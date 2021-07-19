@@ -66,10 +66,8 @@ const toRPN = function (arr) {
       // Se è una funzione
       operatorStack.push(token);
     } else if (isOperator(token)) {
-      while (operatorStack.length &&
-        isOperator(lastOperatorStack) &&
-        lastOperatorStack != '(' &&
-        (isFirstHigherPriority(lastOperatorStack, token) ||
+      while (operatorStack.length && isOperator(lastOperatorStack) &&
+        lastOperatorStack != '(' && (isFirstHigherPriority(lastOperatorStack, token) ||
           (isSamePriority(token, lastOperatorStack) && isLeftAssociative(token)))) {
         outputStack.push(operatorStack.pop());
         lastOperatorStack = operatorStack[operatorStack.length - 1];

@@ -10,16 +10,16 @@
       <div class="row no-wrap">
         <q-btn-dropdown label="VARS">
           <q-list>
-            <q-item clickable v-close-popup @click="appendText">
+            <q-item clickable v-close-popup>
               <q-item-section>
                 <q-item-label
                   v-for="(matrix, index) in matrixes"
                   v-bind:key="index"
-                  @click=""
+                  @click="appendMatrix(matrix)"
                 >
                   {{ matrix.name }}
                 </q-item-label>
-                <q-item-label>Add mat</q-item-label>
+                <q-item-label @click="addMatrix()">Add mat</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -117,6 +117,16 @@ export default defineComponent({
         this.operations.push(text);
       }
     },
+    appendMatrix(matrix) {
+      if (
+        !(
+          this.operations[this.operations.length - 1].matrix instanceof Matrix
+        ) &&
+        !isNaN(this.operations[this.operations.length - 1])
+      ) {
+        this.operations.push(matrix);
+      }
+    },
     clear() {
       this.operations = [];
     },
@@ -134,18 +144,14 @@ export default defineComponent({
     solve() {
       console.log(toRPN(this.operations));
     },
-    addMatrix() {},
+    addMatrix() {
+      this.$router.push('add-matrix');
+    },
   },
 });
 </script>
 
 <style scoped>
-.container {
-  margin-top: 5vh;
-  margin-left: 10vw;
-  margin-right: 10vw;
-  margin-bottom: 10vh;
-}
 .display {
   border: 2px solid black;
   border-radius: 7px;
