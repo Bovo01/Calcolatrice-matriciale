@@ -4,15 +4,15 @@ const routes = [{
     component: () => import('src/pages/Calculator.vue'),
   },
   {
-    name: 'add-matrix',
-    path: '/add-matrix',
-    component: () => import('src/pages/AddMatrix.vue'),
+    name: 'Aggiungi dim matrice',
+    path: '/add-matrix/dim',
+    component: () => import('src/pages/AddMatrix-dim.vue'),
   },
 
   {
-    path: '/add-matrix',
-    name: "Aggiungi matrice",
-    component: () => import('src/pages/AddMatrix.vue'),
+    name: "Aggiungi matrice righe",
+    path: '/add-matrix/rows',
+    component: () => import('src/pages/AddMatrix-rows.vue'),
   },
 
   // Always leave this as last one,

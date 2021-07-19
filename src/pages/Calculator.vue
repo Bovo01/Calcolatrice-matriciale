@@ -164,7 +164,7 @@ export default defineComponent({
       });
     },
     addMatrix() {
-      this.$router.push({ name: "Aggiungi matrice" });
+      this.$router.push({ name: "Aggiungi dim matrice" });
     },
     toggleTheme() {
       this.theme = (this.theme + 1) % this.qtyThemes;
