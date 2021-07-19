@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" :class="{ bubah: theme == 1 }">
     <!-- Display -->
     <div class="row">
       <input class="display" v-model="text" readonly />
@@ -28,10 +28,10 @@
         <q-btn>VIEW MAT</q-btn>
         <q-btn @click="appendText('^')">^</q-btn>
       </div>
-      <!-- Seconda riga (trash,,backspace,/) -->
+      <!-- Seconda riga (trash,BUBAH,backspace,/) -->
       <div class="row no-wrap">
         <q-btn @click="clear()" icon="fas fa-trash" />
-        <q-btn />
+        <q-btn @click="toggleTheme()">THEME</q-btn>
         <q-btn @click="backspace()" icon="fas fa-backspace" />
         <q-btn @click="appendText('/')" icon="fas fa-divide" />
       </div>
@@ -69,7 +69,13 @@
 
 <script>
 import { defineComponent } from "vue";
-import { toRPN, isFunction, isOperator } from "src/model/calculator.js";
+import {
+  isFunction,
+  isOperator,
+  toRPN,
+  resolveRPN,
+} from "src/model/calculator.js";
+import Fraction from "src/model/Fraction.js";
 
 export default defineComponent({
   name: "Calculator",
@@ -77,6 +83,8 @@ export default defineComponent({
     return {
       operations: [],
       parenthesis: 0,
+      theme: 0,
+      qtyThemes: 2,
     };
   },
   computed: {
@@ -142,16 +150,40 @@ export default defineComponent({
       }
     },
     solve() {
-      console.log(toRPN(this.operations));
+      // Converto i numeri in frazioni
+      let operations = [];
+      for (let i = 0; i < this.operations.length; i++) {
+        if (!isNaN(this.operations[i])) {
+          operations.push(new Fraction(this.operations[i]));
+        } else operations.push(this.operations[i]);
+      }
+      this.$q.notify({
+        message: resolveRPN(toRPN(operations)).toString(),
+        position: "top",
+        color: "green",
+      });
     },
     addMatrix() {
-      this.$router.push('add-matrix');
+      this.$router.push({ name: "Aggiungi matrice" });
     },
+    toggleTheme() {
+      this.theme = (this.theme + 1) % this.qtyThemes;
+    },
+  },
+  mounted() {
+    this.operations.push(3);
+    this.operations.push("*");
+    this.operations.push(7);
   },
 });
 </script>
 
 <style scoped>
+.bubah {
+  background-image: url("src/assets/Bubah.jpeg");
+  background-size: cover;
+}
+
 .display {
   border: 2px solid black;
   border-radius: 7px;

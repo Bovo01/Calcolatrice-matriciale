@@ -139,6 +139,10 @@ export default class Fraction {
    * @returns La frazione corrente elevata all'esponente 'e'
    */
   pow(e) {
+    if (e instanceof Fraction)
+      if (e.den == 1)
+        return new Fraction(Math.pow(this.num, e.num), Math.pow(this.den, e.num));
+      else throw "L'esponente deve essere un numero intero";
     if (isNaN(e) || e !== parseInt(e)) throw "L'esponente deve essere un numero intero";
     if (e < 0)
       return new Fraction(Math.pow(this.den, -e), Math.pow(this.num, -e));
@@ -170,6 +174,6 @@ export default class Fraction {
   }
 
   toString() {
-    return `${this.num}/${this.den}`;
+    return this.num + (this.den == 1 ? "" : `/${this.den}`);
   }
 }

@@ -9,6 +9,12 @@ const routes = [{
     component: () => import('src/pages/AddMatrix.vue'),
   },
 
+  {
+    path: '/add-matrix',
+    name: "Aggiungi matrice",
+    component: () => import('src/pages/AddMatrix.vue'),
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {
