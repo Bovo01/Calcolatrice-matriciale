@@ -29,11 +29,16 @@ export default defineComponent({
         this.cols = parseInt(this.cols);
         this.$router.push({
           name: "Aggiungi matrice righe",
-          rows: this.rows,
-          cols: this.cols,
+          params: {
+            rows: parseInt(this.rows),
+            cols: parseInt(this.cols),
+          },
         });
       } else
-        errorDialog(this, "Righe e colonne devono essere numeri interi positivi");
+        errorDialog(
+          this,
+          "Righe e colonne devono essere numeri interi positivi"
+        );
     },
   },
 });

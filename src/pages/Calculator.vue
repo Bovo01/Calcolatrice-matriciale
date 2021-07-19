@@ -1,11 +1,11 @@
 <template>
-  <div class="container" :class="{ bubah: theme == 1 }">
+  <div class="container">
     <!-- Display -->
     <div class="row">
       <input class="display" v-model="text" readonly />
     </div>
     <!-- Bottoni -->
-    <div>
+    <div :class="{ bubah: theme == 1 }">
       <!-- Prima riga (vars,ops,view mat,^) -->
       <div class="row no-wrap">
         <q-btn-dropdown label="VARS">
@@ -170,11 +170,7 @@ export default defineComponent({
       this.theme = (this.theme + 1) % this.qtyThemes;
     },
   },
-  mounted() {
-    this.operations.push(3);
-    this.operations.push("*");
-    this.operations.push(7);
-  },
+  mounted() {},
 });
 </script>
 
