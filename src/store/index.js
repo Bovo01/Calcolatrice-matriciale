@@ -4,6 +4,7 @@ import {
 import {
   createStore
 } from 'vuex'
+import createPersistedState from "vuex-persistedstate";
 
 // import example from './module-example'
 
@@ -18,6 +19,7 @@ import {
 
 export default store(function ( /* { ssrContext } */ ) {
   const Store = createStore({
+    plugins: [createPersistedState()],
     modules: {
       // example
     },
