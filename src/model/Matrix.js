@@ -2,12 +2,13 @@ import Fraction from "./Fraction";
 
 export default class Matrix {
   constructor(rows, cols, matrix = null) {
+    console.log(rows, cols, matrix);
     if (rows <= 0 || cols <= 0) throw "La dimensione della matrice deve essere positiva e non nulla";
     if (!rows || !cols) throw "Devi inserire la dimensione della matrice";
     if (matrix) {
-      if (matrix.length !== rows) throw "La dimensione della matrice non corrisponde alle righe e alle colonne inserite";
+      if (matrix.length != rows) throw "La dimensione della matrice non corrisponde alle righe e alle colonne inserite";
       for (let i = 0; i < matrix.length; i++) {
-        if (matrix[i].length !== cols) throw "La dimensione della matrice non corrisponde alle righe e alle colonne inserite";
+        if (matrix[i].length != cols) throw "La dimensione della matrice non corrisponde alle righe e alle colonne inserite";
         for (let j = 0; j < cols; j++) {
           if (!(matrix[i][j] instanceof Fraction)) {
             if (isNaN(matrix[i][j]) || matrix[i][j] !== parseInt(matrix[i][j])) throw "La matrice deve contenere oggetti di tipo Fraction o numeri interi";

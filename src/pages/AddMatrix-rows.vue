@@ -10,10 +10,17 @@
           readonly
           v-for="(fraction, index) in matrix[currentRow]"
           :key="index"
-          :value="index == currentCol ? currentNumber.join('') : fraction.toString()"
+          :value="
+            index == currentCol ? currentNumber.join('') : fraction.toString()
+          "
           class="matrix-element"
           :class="{ selected: index == currentCol }"
-          :style="{ transform: cols > 3 && currentCol >= 2 ? `translate(${137.5 - 112.5 * currentCol}%)` : '' }"
+          :style="{
+            transform:
+              cols > 3 && currentCol >= 2
+                ? `translate(${137.5 - 112.5 * currentCol}%)`
+                : '',
+          }"
         />
       </div>
     </div>
@@ -48,9 +55,11 @@
         <q-btn
           @click="next()"
           :disable="currentRow == rows - 1 && currentCol == cols - 1"
+          v-if="currentRow != rows - 1 || currentCol != cols - 1"
         >
           NEXT
         </q-btn>
+        <q-btn v-else color="positive" @click="conferma()"> CONFERMA </q-btn>
       </div>
     </div>
   </div>
@@ -58,8 +67,9 @@
 
 <script>
 import { defineComponent } from "@vue/composition-api";
-import { errorDialog } from "src/model/Utilities.js";
+import { errorDialog, successDialog } from "src/model/Utilities.js";
 import Fraction from "src/model/Fraction.js";
+import Matrix from "src/model/Matrix.js";
 
 export default defineComponent({
   data() {
@@ -74,13 +84,14 @@ export default defineComponent({
   },
   methods: {
     initializeMatrix() {
-      this.matrix = [];
+      let matrix = [];
       for (let i = 0; i < this.rows; i++) {
-        this.matrix[i] = [];
+        matrix.push([]);
         for (let j = 0; j < this.cols; j++) {
-          this.matrix[i][j] = new Fraction(0);
+          matrix[i][j] = new Fraction(0);
         }
       }
+      this.matrix = matrix;
     },
     prev() {
       try {
@@ -142,6 +153,8 @@ export default defineComponent({
         this.currentNumber.push(n);
       else if (this.currentNumber[this.currentNumber.length - 1].length < 16)
         this.currentNumber[this.currentNumber.length - 1] += n;
+      else if (parseInt(this.currentNumber[this.currentNumber.length - 1]) == 0)
+        this.currentNumber[this.currentNumber.length - 1] = n;
     },
     setFraction() {
       if (
@@ -150,6 +163,29 @@ export default defineComponent({
       )
         return;
       this.currentNumber.push("/");
+    },
+    conferma() {
+      this.pushInMatrix();
+      this.$store.commit("addMatrix", {
+        name: this.$route.params.name,
+        matrix: new Matrix(
+          this.rows,
+          this.cols,
+          this.convertProxyToMatrix()
+        ),
+      });
+      successDialog(this, `Matrice salvata con nome '${this.$route.params.name}'`);
+      this.$router.push({ name: "calculator" });
+    },
+    convertProxyToMatrix() {
+      let newMat = [];
+      for (let i = 0; i < this.matrix.length; i++) {
+        newMat[i] = [];
+        for (let j = 0; j < this.matrix[i].length; j++) {
+          newMat[i][j] = new Fraction(this.matrix[i][j].num, this.matrix[i][j].den);
+        }
+      }
+      return newMat;
     },
   },
   mounted() {
@@ -206,6 +242,6 @@ export default defineComponent({
   background-color: yellow;
 }
 .container {
-  display: block
+  display: block;
 }
 </style>

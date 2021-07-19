@@ -27,7 +27,7 @@ export default store(function ( /* { ssrContext } */ ) {
     mutations: {
       addMatrix(state, matrix) {
         state.matrixes.push(matrix);
-      }
+      },
     },
     actions: {},
     state: {

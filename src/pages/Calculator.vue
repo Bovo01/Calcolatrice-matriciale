@@ -150,6 +150,7 @@ export default defineComponent({
       }
     },
     solve() {
+      if (this.operations.length < 3) return;
       // Converto i numeri in frazioni
       let operations = [];
       for (let i = 0; i < this.operations.length; i++) {
@@ -160,7 +161,7 @@ export default defineComponent({
       this.$q.notify({
         message: resolveRPN(toRPN(operations)).toString(),
         position: "top",
-        color: "green",
+        color: "positive",
       });
     },
     addMatrix() {

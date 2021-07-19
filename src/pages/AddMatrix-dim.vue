@@ -3,6 +3,7 @@
     <!-- Dimensioni -->
     <q-input outlined v-model="rows" label="Righe" type="number" />
     <q-input outlined v-model="cols" label="Colonne" type="number" />
+    <q-input outlined v-model="name" label="Nome matrice" type="text" />
     <div class="row justify-center">
       <q-btn color="positive" class="confirm" @click="confirmDimensions()">
         Conferma
@@ -20,11 +21,23 @@ export default defineComponent({
     return {
       rows: "",
       cols: "",
+      name: "",
     };
   },
   methods: {
     confirmDimensions() {
       if (parseInt(this.rows) > 0 && parseInt(this.cols) > 0) {
+        if (this.name == "") {
+          errorDialog(this, "Devi inserire il nome della matrice");
+          return;
+        }
+        if (
+          this.$store.getters.matrixes.filter((mat) => mat.name == this.name)
+            .length > 0
+        ) {
+          errorDialog(this, "Il nome della matrice è già salvato in memoria");
+          return;
+        }
         this.rows = parseInt(this.rows);
         this.cols = parseInt(this.cols);
         this.$router.push({
@@ -32,6 +45,7 @@ export default defineComponent({
           params: {
             rows: parseInt(this.rows),
             cols: parseInt(this.cols),
+            name: this.name,
           },
         });
       } else
