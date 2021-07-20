@@ -10,15 +10,20 @@
       <div class="row no-wrap">
         <q-btn-dropdown label="VARS">
           <q-list>
-            <q-item clickable v-close-popup>
+            <q-item
+              clickable
+              v-close-popup
+              v-for="(matrix, index) in matrixes"
+              v-bind:key="index"
+            >
               <q-item-section>
-                <q-item-label
-                  v-for="(matrix, index) in matrixes"
-                  v-bind:key="index"
-                  @click="appendMatrix(matrix)"
-                >
+                <q-item-label @click="appendMatrix(matrix)">
                   {{ matrix.name }}
                 </q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section>
                 <q-item-label @click="addMatrix()">Add mat</q-item-label>
               </q-item-section>
             </q-item>
