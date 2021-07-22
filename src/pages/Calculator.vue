@@ -22,7 +22,7 @@
                 </q-item-label>
               </q-item-section>
             </q-item>
-            <q-item>
+            <q-item clickable v-close-popup>
               <q-item-section>
                 <q-item-label @click="addMatrix()">Add mat</q-item-label>
               </q-item-section>

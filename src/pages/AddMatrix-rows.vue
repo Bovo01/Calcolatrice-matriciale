@@ -1,25 +1,25 @@
 <template>
   <div class="container">
-    <!-- Display con la matrice -->
-    <div>
-      <!-- Intestazione -->
-      <h6 class="text-h6">Riga n. {{ currentRow + 1 }}</h6>
-      <!-- Elementi riga -->
-      <div class="row no-wrap display-row">
+    <!-- Display con la grid -->
+    <div class="display-grid">
+      <div class="row no-wrap" v-for="(row, index) in matrix" :key="index">
         <input
           readonly
-          v-for="(fraction, index) in matrix[currentRow]"
-          :key="index"
+          v-for="(fraction, jndex) in row"
+          :key="jndex"
           :value="
-            index == currentCol ? currentNumber.join('') : fraction.toString()
+            index == currentRow && jndex == currentCol
+              ? currentNumber.join('')
+              : fraction.toString()
           "
           class="matrix-element"
-          :class="{ selected: index == currentCol }"
+          :class="{ selected: jndex == currentCol && index == currentRow }"
           :style="{
-            transform:
-              cols > 3 && currentCol >= 2
-                ? `translate(${137.5 - 112.5 * currentCol}%)`
-                : '',
+            transform: `translate(${
+              cols > 3 && currentCol >= 2 ? 137.5 - 112.5 * currentCol : 0
+            }%, ${
+              rows > 3 && currentRow >= 1 ? -10 - 130 * (currentRow - 1) : 0
+            }%)`,
           }"
         />
       </div>
@@ -151,10 +151,10 @@ export default defineComponent({
     appendText(n) {
       if (isNaN(this.currentNumber[this.currentNumber.length - 1]))
         this.currentNumber.push(n);
-      else if (this.currentNumber[this.currentNumber.length - 1].length < 16)
-        this.currentNumber[this.currentNumber.length - 1] += n;
       else if (parseInt(this.currentNumber[this.currentNumber.length - 1]) == 0)
         this.currentNumber[this.currentNumber.length - 1] = n;
+      else if (this.currentNumber[this.currentNumber.length - 1].length < 16)
+        this.currentNumber[this.currentNumber.length - 1] += n;
     },
     setFraction() {
       if (
@@ -168,13 +168,12 @@ export default defineComponent({
       this.pushInMatrix();
       this.$store.commit("addMatrix", {
         name: this.$route.params.name,
-        matrix: new Matrix(
-          this.rows,
-          this.cols,
-          this.convertProxyToMatrix()
-        ),
+        matrix: new Matrix(this.rows, this.cols, this.convertProxyToMatrix()),
       });
-      successDialog(this, `Matrice salvata con nome '${this.$route.params.name}'`);
+      successDialog(
+        this,
+        `Matrice salvata con nome '${this.$route.params.name}'`
+      );
       this.$router.push({ name: "calculator" });
     },
     convertProxyToMatrix() {
@@ -182,7 +181,10 @@ export default defineComponent({
       for (let i = 0; i < this.matrix.length; i++) {
         newMat[i] = [];
         for (let j = 0; j < this.matrix[i].length; j++) {
-          newMat[i][j] = new Fraction(this.matrix[i][j].num, this.matrix[i][j].den);
+          newMat[i][j] = new Fraction(
+            this.matrix[i][j].num,
+            this.matrix[i][j].den
+          );
         }
       }
       return newMat;
@@ -243,5 +245,13 @@ export default defineComponent({
 }
 .container {
   display: block;
+}
+.display-grid {
+  border: 1px solid rgb(173, 173, 173);
+  height: 40vh;
+  margin-bottom: 5vh;
+  border-radius: 7px;
+  overflow: hidden;
+  flex-flow: column wrap;
 }
 </style>
