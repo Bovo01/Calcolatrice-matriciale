@@ -5,7 +5,8 @@
     <q-input outlined v-model="cols" label="Colonne" type="number" />
     <q-input outlined v-model="name" label="Nome matrice" type="text" />
     <div class="row justify-center">
-      <q-btn color="positive" class="confirm" @click="confirmDimensions()">
+      <q-btn color="negative" class="buttons" @click="back()">Annulla</q-btn>
+      <q-btn color="positive" class="buttons" @click="confirmDimensions()">
         Conferma
       </q-btn>
     </div>
@@ -26,6 +27,9 @@ export default defineComponent({
     };
   },
   methods: {
+    back() {
+      this.$router.push({ name: "calculator" });
+    },
     confirmDimensions() {
       if (
         !this.rows ||
@@ -80,8 +84,12 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.confirm {
+.buttons {
   margin-top: 5vh;
+  margin-right: 5vw;
+}
+.buttons:last-child {
+  margin-right: 0;
 }
 .q-input {
   margin-bottom: 1vh;

@@ -48,9 +48,14 @@
       </div>
       <!-- Quarta riga (PREV,0,NEXT) -->
       <div class="row no-wrap">
-        <q-btn @click="prev()" :disable="currentRow == 0 && currentCol == 0">
+        <q-btn
+          @click="prev()"
+          :disable="currentRow == 0 && currentCol == 0"
+          v-if="currentRow != 0 || currentCol != 0"
+        >
           PREV
         </q-btn>
+        <q-btn v-else color="negative" @click="back()">ANNULLA</q-btn>
         <q-btn @click="appendText(0)">0</q-btn>
         <q-btn
           @click="next()"
@@ -67,7 +72,11 @@
 
 <script>
 import { defineComponent } from "@vue/composition-api";
-import { errorDialog, successDialog, convertProxyToMatrix } from "src/model/Utilities.js";
+import {
+  errorDialog,
+  successDialog,
+  convertProxyToMatrix,
+} from "src/model/Utilities.js";
 import Fraction from "src/model/Fraction.js";
 
 export default defineComponent({
@@ -82,6 +91,9 @@ export default defineComponent({
     };
   },
   methods: {
+    back() {
+      this.$router.push({ name: "calculator" });
+    },
     initializeMatrix() {
       let matrix = [];
       for (let i = 0; i < this.rows; i++) {
