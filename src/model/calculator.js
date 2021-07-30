@@ -1,16 +1,25 @@
 import Fraction from 'src/model/Fraction.js';
 
+const functions = [{
+  name: 'Determinante',
+  funcName: 'det'
+}, {
+  name: 'Rango',
+  funcName: 'rango'
+}, {
+  name: 'Trasposta',
+  funcName: 'tr'
+}, {
+  name: 'Inversa',
+  funcName: 'inv'
+}];
+
 const isFunction = function (token) {
-  switch (token) {
-    // Elenco delle funzioni
-    case 'det':
-    case 'rango':
-    case 'tr':
-    case 'inv':
+  for (let func of functions) {
+    if (token == func.funcName)
       return true;
-    default:
-      return false;
   }
+  return false;
 }
 
 const isOperator = function (token) {
@@ -132,6 +141,7 @@ const resolveBasicOperation = function (n1, n2, op) {
 export {
   isFunction,
   isOperator,
+  functions,
   toRPN,
   resolveRPN,
 };

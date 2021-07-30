@@ -8,6 +8,7 @@
     <div :class="{ bubah: theme == 1 }">
       <!-- Prima riga (vars,ops,view mat,^) -->
       <div class="row no-wrap">
+        <!-- Dropdown VARS -->
         <q-btn-dropdown label="VARS">
           <q-list>
             <q-item
@@ -29,7 +30,23 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <q-btn>OPS</q-btn>
+        <!-- Dropdown OPS -->
+        <q-btn-dropdown label="OPS">
+          <q-list>
+            <q-item
+              clickable
+              v-close-popup
+              v-for="(operation, index) in ops"
+              v-bind:key="index"
+            >
+              <q-item-section>
+                <q-item-label @click="appendFunction(operation)">
+                  {{ operation.name }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
         <q-btn>VIEW MAT</q-btn>
         <q-btn @click="appendText('^')">^</q-btn>
       </div>
@@ -79,6 +96,7 @@ import {
   isOperator,
   toRPN,
   resolveRPN,
+  functions,
 } from "src/model/calculator.js";
 import Fraction from "src/model/Fraction.js";
 import Matrix from "src/model/Matrix.js";
@@ -92,6 +110,7 @@ export default defineComponent({
       parenthesis: 0,
       theme: 0,
       qtyThemes: 2,
+      ops: functions,
     };
   },
   computed: {
@@ -130,6 +149,20 @@ export default defineComponent({
         }
       } else {
         this.operations.push(text);
+      }
+    },
+    appendFunction(operation) {
+      let lastOperation = this.operations[this.operations.length - 1];
+      if (
+        this.operations.length == 0 ||
+        (isNaN(lastOperation) &&
+          this.$store.getters.matrixes.filter(
+            (mat) => mat.name == lastOperation
+          ).length == 0)
+      ) {
+        this.operations.push(operation.funcName);
+        this.operations.push("(");
+        this.parenthesis++;
       }
     },
     appendMatrix(matrix) {
