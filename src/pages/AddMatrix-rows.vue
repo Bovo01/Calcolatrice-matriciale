@@ -67,9 +67,8 @@
 
 <script>
 import { defineComponent } from "@vue/composition-api";
-import { errorDialog, successDialog } from "src/model/Utilities.js";
+import { errorDialog, successDialog, convertProxyToMatrix } from "src/model/Utilities.js";
 import Fraction from "src/model/Fraction.js";
-import Matrix from "src/model/Matrix.js";
 
 export default defineComponent({
   data() {
@@ -79,14 +78,14 @@ export default defineComponent({
       currentRow: 0,
       currentCol: 0,
       currentNumber: [0],
-      matrix: [],
+      matrix: Array,
     };
   },
   methods: {
     initializeMatrix() {
       let matrix = [];
       for (let i = 0; i < this.rows; i++) {
-        matrix.push([]);
+        matrix[i] = [];
         for (let j = 0; j < this.cols; j++) {
           matrix[i][j] = new Fraction(0);
         }
@@ -168,7 +167,9 @@ export default defineComponent({
       this.pushInMatrix();
       this.$store.commit("addMatrix", {
         name: this.$route.params.name,
-        matrix: new Matrix(this.rows, this.cols, this.convertProxyToMatrix()),
+        rows: this.rows,
+        cols: this.cols,
+        matrix: convertProxyToMatrix(this.matrix),
       });
       successDialog(
         this,
@@ -176,25 +177,17 @@ export default defineComponent({
       );
       this.$router.push({ name: "calculator" });
     },
-    convertProxyToMatrix() {
-      let newMat = [];
-      for (let i = 0; i < this.matrix.length; i++) {
-        newMat[i] = [];
-        for (let j = 0; j < this.matrix[i].length; j++) {
-          newMat[i][j] = new Fraction(
-            this.matrix[i][j].num,
-            this.matrix[i][j].den
-          );
-        }
-      }
-      return newMat;
-    },
   },
   mounted() {
     this.rows = this.$route.params.rows;
     this.cols = this.$route.params.cols;
-    if (this.rows < 0 || this.cols < 0) {
-      this.router.push({ name: "Aggiungi dim matrice" });
+    if (
+      this.rows == undefined ||
+      this.cols == undefined ||
+      this.rows <= 0 ||
+      this.cols <= 0
+    ) {
+      this.$router.push({ name: "Aggiungi dim matrice" });
       return;
     }
     this.initializeMatrix();

@@ -81,6 +81,8 @@ import {
   resolveRPN,
 } from "src/model/calculator.js";
 import Fraction from "src/model/Fraction.js";
+import Matrix from "src/model/Matrix.js";
+import { convertProxyToMatrix } from "src/model/Utilities.js";
 
 export default defineComponent({
   name: "Calculator",
@@ -131,13 +133,14 @@ export default defineComponent({
       }
     },
     appendMatrix(matrix) {
+      let lastOperation = this.operations[this.operations.length - 1];
       if (
-        !(
-          this.operations[this.operations.length - 1].matrix instanceof Matrix
-        ) &&
-        !isNaN(this.operations[this.operations.length - 1])
+        this.operations.length == 0 ||
+        (this.$store.getters.matrixes.filter((mat) => mat.name == lastOperation)
+          .length == 0 &&
+          isNaN(lastOperation))
       ) {
-        this.operations.push(matrix);
+        this.operations.push(matrix.name);
       }
     },
     clear() {

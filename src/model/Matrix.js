@@ -2,7 +2,6 @@ import Fraction from "./Fraction";
 
 export default class Matrix {
   constructor(rows, cols, matrix = null) {
-    console.log(rows, cols, matrix);
     if (rows <= 0 || cols <= 0) throw "La dimensione della matrice deve essere positiva e non nulla";
     if (!rows || !cols) throw "Devi inserire la dimensione della matrice";
     if (matrix) {

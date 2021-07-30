@@ -15,6 +15,7 @@
 <script>
 import { defineComponent } from "@vue/composition-api";
 import { errorDialog } from "src/model/Utilities.js";
+import { isFunction, isOperator } from "src/model/calculator.js";
 
 export default defineComponent({
   data() {
@@ -26,33 +27,53 @@ export default defineComponent({
   },
   methods: {
     confirmDimensions() {
-      if (parseInt(this.rows) > 0 && parseInt(this.cols) > 0) {
-        if (this.name == "") {
-          errorDialog(this, "Devi inserire il nome della matrice");
-          return;
-        }
-        if (
-          this.$store.getters.matrixes.filter((mat) => mat.name == this.name)
-            .length > 0
-        ) {
-          errorDialog(this, "Il nome della matrice è già salvato in memoria");
-          return;
-        }
-        this.rows = parseInt(this.rows);
-        this.cols = parseInt(this.cols);
-        this.$router.push({
-          name: "Aggiungi matrice righe",
-          params: {
-            rows: parseInt(this.rows),
-            cols: parseInt(this.cols),
-            name: this.name,
-          },
-        });
-      } else
+      if (
+        !this.rows ||
+        !this.cols ||
+        parseInt(this.rows) <= 0 ||
+        parseInt(this.cols) <= 0
+      ) {
         errorDialog(
           this,
           "Righe e colonne devono essere numeri interi positivi"
         );
+        return;
+      }
+      if (this.name == "") {
+        errorDialog(this, "Devi inserire il nome della matrice");
+        return;
+      }
+      if (
+        this.$store.getters.matrixes.filter((mat) => mat.name == this.name)
+          .length > 0
+      ) {
+        errorDialog(this, "Il nome della matrice è già salvato in memoria");
+        return;
+      }
+      if (isFunction(this.name)) {
+        errorDialog(
+          this,
+          "Il nome della matrice non può corrispondere con una funzione"
+        );
+        return;
+      }
+      if (isOperator(this.name)) {
+        errorDialog(
+          this,
+          "Il nome della matrice non può corrispondere con un operatore"
+        );
+        return;
+      }
+      this.rows = parseInt(this.rows);
+      this.cols = parseInt(this.cols);
+      this.$router.push({
+        name: "Aggiungi matrice righe",
+        params: {
+          rows: parseInt(this.rows),
+          cols: parseInt(this.cols),
+          name: this.name,
+        },
+      });
     },
   },
 });
