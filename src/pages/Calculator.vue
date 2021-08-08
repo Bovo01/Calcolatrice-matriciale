@@ -155,10 +155,7 @@ export default defineComponent({
       let lastOperation = this.operations[this.operations.length - 1];
       if (
         this.operations.length == 0 ||
-        (isNaN(lastOperation) &&
-          this.$store.getters.matrixes.filter(
-            (mat) => mat.name == lastOperation
-          ).length == 0)
+        (isNaN(lastOperation) && !this.isMatrix(lastOperation))
       ) {
         this.operations.push(operation.funcName);
         this.operations.push("(");
@@ -169,12 +166,16 @@ export default defineComponent({
       let lastOperation = this.operations[this.operations.length - 1];
       if (
         this.operations.length == 0 ||
-        (this.$store.getters.matrixes.filter((mat) => mat.name == lastOperation)
-          .length == 0 &&
-          isNaN(lastOperation))
+        (this.isMatrix(lastOperation) && isNaN(lastOperation))
       ) {
         this.operations.push(matrix.name);
       }
+    },
+    isMatrix(matrixName) {
+      return (
+        this.$store.getters.matrixes.filter((mat) => mat.name == matrixName)
+          .length > 0
+      );
     },
     clear() {
       this.operations = [];
