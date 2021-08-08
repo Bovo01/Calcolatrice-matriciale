@@ -28,6 +28,17 @@ export default class Matrix {
     this.cols = cols;
   }
 
+  static identity(dim) {
+    if (isNaN(dim) || dim < 1) throw "La dimensione deve essere un numero intero positivo";
+    let tempMat = [];
+    for (let i = 0; i < dim; i++) {
+      tempMat[i] = [];
+      for (let j = 0; j < dim; j++) {
+        tempMat[i][j] = new Fraction(i == j ? 1 : 0);
+      }
+    }
+  }
+
   /**
    * Funzione logicamente privata che permette di creare una nuova matrice in base alle righe inserite (le colonne non sono necessarie)
    * 
@@ -152,18 +163,44 @@ export default class Matrix {
   sub(m) {
     return this.add(m._multPerScalare(-1));
   }
-  
+
   /**
    * Funzione che permette di moltiplicare la matrice corrente alla matrice o allo scalare passati per parametro
    * 
    * @param {Matrix|Number|Fraction} x La matrice (o lo scalare) da moltiplicare a quella corrente
    * @returns Un nuovo oggetto di classe Matrix contenente il prodotto tra le due matrici (o tra matrice e scalare)
    */
-   mult(x) {
+  mult(x) {
     if (x instanceof Matrix)
       return this._multPerMatrice(x);
     else
       return this._multPerScalare(x);
+  }
+
+  /**
+   * 
+   * 
+   * @param {Fraction|Number} n 
+   */
+  pow(n) {
+    if (n instanceof Fraction) {
+      if (n.den != 1)
+        throw "Impossibile elevare una matrice ad un numero frazionario";
+      n = n.num;
+    }
+    if (isNaN(n)) throw "L'esponente deve essere un numero intero";
+    if (this.rows != this.cols) throw "Non è possibile elevare a potenza una matrice non quadrata";
+    if (n == 0) return Matrix.identity(this.rows);
+    let tempMat = this.clone();
+    if (n < 0) {
+      tempMat = tempMat.inversa();
+      n *= -1;
+    }
+    let ris = tempMat.clone();
+    for (let i = 0; i < n; i++) {
+      ris = ris.mult(tempMat);
+    }
+    return ris;
   }
 
   /**
@@ -187,7 +224,7 @@ export default class Matrix {
    * @returns Un nuovo oggetto di classe Matrix contenente la matrice a scala della matrice corrente
    */
   riduzioneScala() {
-    let newMat = new Matrix(this.rows, this.cols, this._copyMatrix());
+    let newMat = this.clone();
     // Indica la riga del pivot
     let c = 0;
     for (let j = 0; j < this.cols && c < this.rows; j++) {
@@ -279,6 +316,15 @@ export default class Matrix {
       }
     }
     return new Matrix(this.rows, this.cols, newMat).transposition().mult(det.reciprocal());
+  }
+
+  /**
+   * Copia la matrice attuale
+   * 
+   * @returns Una nuova matrice uguale a quella corrente
+   */
+  clone() {
+    return new Matrix(this.rows, this.cols, this._copyMatrix());
   }
 
   /**

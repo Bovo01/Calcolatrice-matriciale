@@ -94,13 +94,12 @@ import { defineComponent } from "vue";
 import {
   isFunction,
   isOperator,
+  isMatrix,
   toRPN,
   resolveRPN,
   functions,
 } from "src/model/calculator.js";
 import Fraction from "src/model/Fraction.js";
-import Matrix from "src/model/Matrix.js";
-import { convertProxyToMatrix } from "src/model/Utilities.js";
 
 export default defineComponent({
   name: "Calculator",
@@ -155,7 +154,7 @@ export default defineComponent({
       let lastOperation = this.operations[this.operations.length - 1];
       if (
         this.operations.length == 0 ||
-        (isNaN(lastOperation) && !this.isMatrix(lastOperation))
+        (isNaN(lastOperation) && !isMatrix(lastOperation, this))
       ) {
         this.operations.push(operation.funcName);
         this.operations.push("(");
@@ -166,16 +165,10 @@ export default defineComponent({
       let lastOperation = this.operations[this.operations.length - 1];
       if (
         this.operations.length == 0 ||
-        (this.isMatrix(lastOperation) && isNaN(lastOperation))
+        (isMatrix(lastOperation, this) && isNaN(lastOperation))
       ) {
         this.operations.push(matrix.name);
       }
-    },
-    isMatrix(matrixName) {
-      return (
-        this.$store.getters.matrixes.filter((mat) => mat.name == matrixName)
-          .length > 0
-      );
     },
     clear() {
       this.operations = [];
@@ -201,7 +194,7 @@ export default defineComponent({
         } else operations.push(this.operations[i]);
       }
       this.$q.notify({
-        message: resolveRPN(toRPN(operations)).toString(),
+        message: resolveRPN(toRPN(operations, this)).toString(),
         position: "top",
         color: "positive",
       });
