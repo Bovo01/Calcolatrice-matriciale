@@ -1,5 +1,6 @@
 import Fraction from 'src/model/Fraction.js';
 
+/** Array contenente l'elenco delle funzioni, con nome esteso e abbreviato */
 const functions = [{
   name: 'Determinante',
   funcName: 'det'
@@ -14,6 +15,39 @@ const functions = [{
   funcName: 'inv'
 }];
 
+/**
+ * Permette di ricavare la matrice corrispondente al nome
+ * 
+ * @param {String} matrixName Il nome della matrice
+ * @param {String} self Il riferimento all'elemento Vue (per accedere allo store)
+ * @returns La matrice corrispondente a matrixName
+ */
+const getMatrixFromName = function (matrixName, self) {
+  let temp = self.$store.getters.matrixes.filter((mat) => mat.name == matrixName);
+  if (temp.length == 0) throw "Non esiste una matrice con il nome inserito";
+  return temp[0];
+}
+
+/**
+ * Controlla se la stringa inserita coincide con una matrice salvata nello store
+ * 
+ * @param {String} matrixName Il nome della matrice
+ * @param {String} self Il riferimento all'elemento Vue (per accedere allo store)
+ * @returns true se la stringa inserita rappresenta una matrice nello store, false altrimenti
+ */
+const isMatrix = function (matrixName, self) {
+  return (
+    self.$store.getters.matrixes.filter((mat) => mat.name == matrixName)
+    .length > 0
+  );
+}
+
+/**
+ * Controlla se il token rappresenta una funzione
+ * 
+ * @param {String} token Stringa da controllare
+ * @returns true se il token è una funzione valida, false altrimenti
+ */
 const isFunction = function (token) {
   for (let func of functions) {
     if (token == func.funcName)
@@ -22,17 +56,12 @@ const isFunction = function (token) {
   return false;
 }
 
-const getMatrixFromName = function (matrixName, self) {
-  self.$store.getters.matrixes.filter((mat) => mat.name == matrixName)[0];
-}
-
-const isMatrix = function (matrixName, self) {
-  return (
-    self.$store.getters.matrixes.filter((mat) => mat.name == matrixName)
-    .length > 0
-  );
-}
-
+/**
+ * Controlla se il token è un operatore valido
+ * 
+ * @param {String} token La stringa da controllare
+ * @returns true se il token è un operatore, false altrimenti
+ */
 const isOperator = function (token) {
   switch (token) {
     case '+':
@@ -46,6 +75,13 @@ const isOperator = function (token) {
   }
 }
 
+/**
+ * Controlla se il primo operatore ha una priorità maggiore del secondo
+ * 
+ * @param {String} op1 Il primo operatore
+ * @param {String} op2 Il secondo operatore
+ * @returns true se il primo operatore ha priorità maggiore del secondo, false altrimenti
+ */
 const isFirstHigherPriority = function (op1, op2) {
   switch (op2) {
     case '+':
@@ -59,6 +95,13 @@ const isFirstHigherPriority = function (op1, op2) {
   }
 }
 
+/**
+ * Controlla se i due operatori inseriti hanno la stessa priorità in un'espressione (l'ordine in cui vanno eseguiti)
+ * 
+ * @param {String} op1 Il primo operatore
+ * @param {String} op2 Il secondo operatore
+ * @returns true se i due operatori hanno la stessa priorità, false altrimenti
+ */
 const isSamePriority = function (op1, op2) {
   switch (op2) {
     case '+':
@@ -72,10 +115,23 @@ const isSamePriority = function (op1, op2) {
   }
 }
 
+/**
+ * Controlla se l'operatore inserito è associativo a sinistra (va eseguito da sinistra a destra)
+ * 
+ * @param {String} op L'operatore da controllare
+ * @returns true se l'operatore è associativo a sinistra, false altrimenti
+ */
 const isLeftAssociative = function (op) {
   return op != '^';
 }
 
+/**
+ * Converte un'espressione in forma canonica (come siamo abituati a vederla) in una in notazione polacca inversa
+ * 
+ * @param {Array} arr L'array delle operazioni facenti parte dell'espressione canonica
+ * @param {Object} self Riferimento all'oggetto Vue (serve per accedere allo store dove ci sono le matrici)
+ * @returns Un array contenente l'espressione in notazione polacca inversa
+ */
 const toRPN = function (arr, self) {
   let outputStack = [];
   let operatorStack = [];
@@ -122,6 +178,12 @@ const toRPN = function (arr, self) {
   return outputStack;
 }
 
+/**
+ * Calcola il risultato dell'rpn inserito per parametro
+ * 
+ * @param {Array} rpn Le operazioni da fare in notazione polacca inversa
+ * @returns Una frazione o una matrice che rappresenta il risultato dell'espressione
+ */
 const resolveRPN = function (rpn) {
   let stack = [];
   for (let elem of rpn) {
@@ -143,6 +205,31 @@ const resolveRPN = function (rpn) {
       stack.push(elem);
   }
   return stack.pop();
+}
+
+/**
+ * Risolve operazioni base tra frazioni
+ * 
+ * @param {Fraction} n1 Il primo operando
+ * @param {Fraction} n2 Il secondo operando
+ * @param {String} op L'operatore
+ * @returns Il risultato dell'operazione
+ */
+const resolveBasicOperation = function (n1, n2, op) {
+  switch (op) {
+    case '*':
+      return n1.mult(n2);
+    case '/':
+      return n2.div(n1);
+    case '+':
+      return n1.add(n2);
+    case '-':
+      return n2.sub(n1);
+    case '^':
+      return n2.pow(n1);
+    default:
+      throw "Operatore non valido";
+  }
 }
 
 /**
@@ -173,23 +260,6 @@ const resolveMatrixOperation = function (n1, n2, op) {
       if (n2 instanceof Matrix)
         return n2.pow(n1);
       throw "Impossibile elevare uno scalare ad una matrice";
-    default:
-      throw "Operatore non valido";
-  }
-}
-
-const resolveBasicOperation = function (n1, n2, op) {
-  switch (op) {
-    case '*':
-      return n1.mult(n2);
-    case '/':
-      return n2.div(n1);
-    case '+':
-      return n1.add(n2);
-    case '-':
-      return n2.sub(n1);
-    case '^':
-      return n2.pow(n1);
     default:
       throw "Operatore non valido";
   }
