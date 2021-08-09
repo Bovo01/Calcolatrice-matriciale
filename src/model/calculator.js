@@ -4,30 +4,28 @@ import Fraction from 'src/model/Fraction.js';
  * Contiene anche informazioni sull'applicazione della funzione (su matrice o scalare)
  */
 const functions = [{
-  name: 'Determinante',
-  funcName: 'det',
-  targets: ['matrix']
-}, {
-  name: 'Rango',
-  funcName: 'rango',
-  targets: ['matrix']
-}, {
-  name: 'Trasposta',
-  funcName: 'tr',
-  targets: ['matrix']
-}, {
-  name: 'Inversa',
-  funcName: 'inv',
-  targets: ['matrix']
-}, {
-  name: 'Seno',
-  funcName: 'sin',
-  targets: ['scalar']
-}, {
-  name: 'Coseno',
-  funcName: 'cos',
-  targets: ['scalar']
-}];
+    name: 'Determinante',
+    funcName: 'det',
+    targets: ['matrix']
+  }, {
+    name: 'Rango',
+    funcName: 'rango',
+    targets: ['matrix']
+  }, {
+    name: 'Trasposta',
+    funcName: 'tr',
+    targets: ['matrix']
+  }, {
+    name: 'Inversa',
+    funcName: 'inv',
+    targets: ['matrix']
+  }
+  /*, {
+    name: 'Seno',
+    funcName: 'sin',
+    targets: ['scalar']
+  }*/
+];
 
 /**
  * Permette di ricavare la matrice corrispondente al nome
