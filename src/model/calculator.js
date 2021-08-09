@@ -13,7 +13,7 @@ const functions = [{
     targets: ['matrix']
   }, {
     name: 'Rango',
-    funcName: 'rango',
+    funcName: 'rank',
     targets: ['matrix']
   }, {
     name: 'Trasposta',

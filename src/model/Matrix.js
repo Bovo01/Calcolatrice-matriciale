@@ -193,7 +193,7 @@ export default class Matrix {
     if (n == 0) return Matrix.identity(this.rows);
     let tempMat = this.clone();
     if (n < 0) {
-      tempMat = tempMat.inversa();
+      tempMat = tempMat.inv();
       n *= -1;
     }
     let ris = tempMat.clone();
@@ -208,7 +208,7 @@ export default class Matrix {
    * 
    * @returns Un nuovo oggetto di classe Matrix contenente la trasposta della matrice corrente
    */
-  transposition() {
+  tr() {
     let tempMatrix = this._createMatrix(this.cols);
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
@@ -263,7 +263,7 @@ export default class Matrix {
    * 
    * @returns Un numero intero che rappresenta il rango della matrice corrente
    */
-  rango() {
+  rank() {
     let matrScala = this.riduzioneScala();
     let rango = 0;
     for (let i = 0; i < this.rows; i++) {
@@ -303,7 +303,7 @@ export default class Matrix {
    * 
    * @returns Un nuovo oggetto di classe Matrix contenente la matrice inversa a quella corrente
    */
-  inversa() {
+  inv() {
     if (this.rows !== this.cols) throw "Impossibile trovare la matrice inversa di una matrice non quadrata"
     let det = this.det();
     if (det.equals(0)) throw "Impossibile calcolare la matrice inversa quando il determinante è uguale a zero";
@@ -315,7 +315,7 @@ export default class Matrix {
           .mult(Math.pow(-1, i + j));
       }
     }
-    return new Matrix(this.rows, this.cols, newMat).transposition().mult(det.reciprocal());
+    return new Matrix(this.rows, this.cols, newMat).tr().mult(det.reciprocal());
   }
 
   /**
