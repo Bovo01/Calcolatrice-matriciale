@@ -1,8 +1,11 @@
 <template>
   <div class="container">
     <!-- Display -->
-    <div class="row">
+    <div class="row" style="position: relative">
       <input class="display" v-model="text" readonly />
+      <span class="result" :class="{ hide: !displayResult }">
+        ={{ result }}
+      </span>
     </div>
     <!-- Bottoni -->
     <div :class="{ bubah: theme == 1 }">
@@ -110,6 +113,8 @@ export default defineComponent({
       theme: 0,
       qtyThemes: 2,
       ops: functions,
+      result: String,
+      displayResult: false,
     };
   },
   computed: {
@@ -121,7 +126,14 @@ export default defineComponent({
     },
   },
   methods: {
+    appendChecks() {
+      if (this.displayResult) {
+        this.operations = [];
+        this.displayResult = false;
+      }
+    },
     appendText(text) {
+      this.appendChecks();
       text = String(text);
       let lastOperation = this.operations[this.operations.length - 1];
       if (!isNaN(text) && !isNaN(lastOperation)) {
@@ -151,6 +163,7 @@ export default defineComponent({
       }
     },
     appendFunction(operation) {
+      this.appendChecks();
       let lastOperation = this.operations[this.operations.length - 1];
       if (
         this.operations.length == 0 ||
@@ -162,6 +175,7 @@ export default defineComponent({
       }
     },
     appendMatrix(matrix) {
+      this.appendChecks();
       let lastOperation = this.operations[this.operations.length - 1];
       if (
         this.operations.length == 0 ||
@@ -194,7 +208,7 @@ export default defineComponent({
       }
     },
     solve() {
-      if (this.operations.length < 3) return;
+      if (this.operations.length < 1) return;
       // Converto i numeri in frazioni
       let operations = [];
       for (let i = 0; i < this.operations.length; i++) {
@@ -205,11 +219,13 @@ export default defineComponent({
       try {
         let result = solve(operations, this);
         console.log(result);
-        this.$q.notify({
+        /*this.$q.notify({
           message: result.toString(),
           position: "top",
           color: "positive",
-        });
+        });*/
+        this.result = result.toString();
+        this.displayResult = true;
       } catch (e) {
         errorDialog(this, e);
         console.error(e);
@@ -227,11 +243,12 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/* Themes */
 .bubah {
   background-image: url("src/assets/Bubah.jpeg");
   background-size: cover;
 }
-
+/* Display */
 .display {
   border: 2px solid black;
   border-radius: 7px;
@@ -241,6 +258,18 @@ export default defineComponent({
   outline-width: 0;
   font-size: min(4vw, 4vh);
 }
+.result {
+  position: absolute;
+  left: 1%;
+  bottom: 5%;
+  font-size: 125%;
+  cursor: default;
+  color: rgba(128, 128, 128, 0.5);
+}
+.hide {
+  display: none;
+}
+/* Tastierino */
 .row {
   margin-top: 3vh;
 }
