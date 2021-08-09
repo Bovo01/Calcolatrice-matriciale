@@ -95,8 +95,7 @@ import {
   isFunction,
   isOperator,
   isMatrix,
-  toRPN,
-  resolveRPN,
+  solve,
   functions,
 } from "src/model/calculator.js";
 import Fraction from "src/model/Fraction.js";
@@ -204,7 +203,7 @@ export default defineComponent({
         } else operations.push(this.operations[i]);
       }
       try {
-        let result = resolveRPN(toRPN(operations, this));
+        let result = solve(operations, this);
         console.log(result);
         this.$q.notify({
           message: result.toString(),

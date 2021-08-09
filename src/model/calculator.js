@@ -267,6 +267,17 @@ const resolveRPN = function (rpn) {
 }
 
 /**
+ * Risolve un'equazione canonica (come siamo abituati a vederla)
+ * 
+ * @param {Array} expression L'espressione con tutti gli elementi separati come array
+ * @param {Object} self Riferimento all'oggetto Vue
+ * @returns Una frazione o una matrice risultante dell'espressione
+ */
+const solve = function (expression, self) {
+  return resolveRPN(toRPN(expression, self));
+}
+
+/**
  * Risolve operazioni base tra frazioni
  * 
  * @param {Fraction} n1 Il primo operando
@@ -329,6 +340,5 @@ export {
   isOperator,
   isMatrix,
   functions,
-  toRPN,
-  resolveRPN,
+  solve
 };
