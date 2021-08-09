@@ -256,13 +256,13 @@ export default defineComponent({
   width: 80vw;
   cursor: default;
   outline-width: 0;
-  font-size: min(4vw, 4vh);
+  font-size: min(5.5vw, 5.5vh);
 }
 .result {
   position: absolute;
-  left: 1%;
-  bottom: 5%;
-  font-size: 125%;
+  left: 1vw;
+  bottom: 1vh;
+  font-size: min(3vh, 3vw);
   cursor: default;
   color: rgba(128, 128, 128, 0.5);
 }
