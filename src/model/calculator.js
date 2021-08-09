@@ -1,4 +1,5 @@
 import Fraction from 'src/model/Fraction.js';
+import Matrix from 'src/model/Matrix.js';
 
 /** Array contenente l'elenco delle funzioni, con nome esteso e abbreviato.
  * Contiene anche informazioni sull'applicazione della funzione (su matrice o scalare)
@@ -247,12 +248,13 @@ const resolveRPN = function (rpn) {
         );
       }
     } else if (isFunction(elem)) {
+      let n = stack.pop();
       if (n instanceof Matrix && !isMatrixFunction(elem))
         throw `Impossibile calcolare la funzione '${elem}' su una matrice`;
       if (!(n instanceof Matrix) && !isScalarFunction(elem))
         throw `Impossibile calcolare la funzione '${elem}' su uno scalare`;
       // Sintassi un po' particolare, ma poppa la cima dello stack e ci esegue la funzione col nome indicato in elem
-      stack.pop()[elem]();
+      n[elem]();
     } else
       stack.push(elem);
   }

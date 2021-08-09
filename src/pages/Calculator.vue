@@ -100,6 +100,7 @@ import {
   functions,
 } from "src/model/calculator.js";
 import Fraction from "src/model/Fraction.js";
+import { errorDialog } from "src/model/Utilities";
 
 export default defineComponent({
   name: "Calculator",
@@ -202,11 +203,15 @@ export default defineComponent({
           operations.push(new Fraction(this.operations[i]));
         } else operations.push(this.operations[i]);
       }
-      this.$q.notify({
-        message: resolveRPN(toRPN(operations, this)).toString(),
-        position: "top",
-        color: "positive",
-      });
+      try {
+        this.$q.notify({
+          message: resolveRPN(toRPN(operations, this)).toString(),
+          position: "top",
+          color: "positive",
+        });
+      } catch (e) {
+        errorDialog(this, e);
+      }
     },
     addMatrix() {
       this.$router.push({ name: "Aggiungi dim matrice" });
