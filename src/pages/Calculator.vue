@@ -166,7 +166,7 @@ export default defineComponent({
       let lastOperation = this.operations[this.operations.length - 1];
       if (
         this.operations.length == 0 ||
-        (isMatrix(lastOperation, this) && isNaN(lastOperation))
+        (!isMatrix(lastOperation, this) && isNaN(lastOperation))
       ) {
         this.operations.push(matrix.name);
       }
@@ -204,13 +204,16 @@ export default defineComponent({
         } else operations.push(this.operations[i]);
       }
       try {
+        let result = resolveRPN(toRPN(operations, this));
+        console.log(result);
         this.$q.notify({
-          message: resolveRPN(toRPN(operations, this)).toString(),
+          message: result.toString(),
           position: "top",
           color: "positive",
         });
       } catch (e) {
         errorDialog(this, e);
+        console.error(e);
       }
     },
     addMatrix() {

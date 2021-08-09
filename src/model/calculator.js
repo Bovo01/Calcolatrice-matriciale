@@ -1,5 +1,8 @@
 import Fraction from 'src/model/Fraction.js';
 import Matrix from 'src/model/Matrix.js';
+import {
+  convertProxyToMatrix
+} from 'src/model/Utilities.js';
 
 /** Array contenente l'elenco delle funzioni, con nome esteso e abbreviato.
  * Contiene anche informazioni sull'applicazione della funzione (su matrice o scalare)
@@ -38,7 +41,7 @@ const functions = [{
 const getMatrixFromName = function (matrixName, self) {
   let temp = self.$store.getters.matrixes.filter((mat) => mat.name == matrixName);
   if (temp.length == 0) throw "Non esiste una matrice con il nome inserito";
-  return temp[0];
+  return new Matrix(temp[0].matrix.rows, temp[0].matrix.cols, convertProxyToMatrix(temp[0].matrix.matrix));
 }
 
 /**
@@ -249,20 +252,18 @@ const resolveRPN = function (rpn) {
       }
     } else if (isFunction(elem)) {
       let n = stack.pop();
+      console.log(n, elem)
+
       if (n instanceof Matrix && !isMatrixFunction(elem))
         throw `Impossibile calcolare la funzione '${elem}' su una matrice`;
       if (!(n instanceof Matrix) && !isScalarFunction(elem))
         throw `Impossibile calcolare la funzione '${elem}' su uno scalare`;
       // Sintassi un po' particolare, ma poppa la cima dello stack e ci esegue la funzione col nome indicato in elem
-      n[elem]();
+      stack.push(n[elem]());
     } else
       stack.push(elem);
   }
   return stack.pop();
-}
-
-const executeMatrixFunction = function (matrix, funcName) {
-  return matrix[funcName]();
 }
 
 /**
