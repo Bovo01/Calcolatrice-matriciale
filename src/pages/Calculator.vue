@@ -175,9 +175,18 @@ export default defineComponent({
     },
     backspace() {
       let lastOperation = this.operations[this.operations.length - 1];
-      if (isNaN(lastOperation) || lastOperation.length <= 1)
-        this.operations.pop();
-      else {
+      if (isNaN(lastOperation) || lastOperation.length <= 1) {
+        if (lastOperation != "(") this.operations.pop();
+        else {
+          if (
+            this.operations.length > 1 &&
+            isFunction(this.operations[this.operations.length - 2])
+          ) {
+            this.operations.pop();
+          }
+          this.operations.pop();
+        }
+      } else {
         this.operations[this.operations.length - 1] = lastOperation.substring(
           0,
           lastOperation.length - 1

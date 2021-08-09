@@ -1,18 +1,32 @@
 import Fraction from 'src/model/Fraction.js';
 
-/** Array contenente l'elenco delle funzioni, con nome esteso e abbreviato */
+/** Array contenente l'elenco delle funzioni, con nome esteso e abbreviato.
+ * Contiene anche informazioni sull'applicazione della funzione (su matrice o scalare)
+ */
 const functions = [{
   name: 'Determinante',
-  funcName: 'det'
+  funcName: 'det',
+  targets: ['matrix']
 }, {
   name: 'Rango',
-  funcName: 'rango'
+  funcName: 'rango',
+  targets: ['matrix']
 }, {
   name: 'Trasposta',
-  funcName: 'tr'
+  funcName: 'tr',
+  targets: ['matrix']
 }, {
   name: 'Inversa',
-  funcName: 'inv'
+  funcName: 'inv',
+  targets: ['matrix']
+}, {
+  name: 'Seno',
+  funcName: 'sin',
+  targets: ['scalar']
+}, {
+  name: 'Coseno',
+  funcName: 'cos',
+  targets: ['scalar']
 }];
 
 /**
@@ -52,6 +66,40 @@ const isFunction = function (token) {
   for (let func of functions) {
     if (token == func.funcName)
       return true;
+  }
+  return false;
+}
+
+/**
+ * Controlla se la funzione 'funcName' è o meno applicabile alle matrici
+ * 
+ * @param {String} funcName Il nome della funzione da controllare
+ * @returns true se funcName è calcolabile su una matrice, false altrimenti
+ */
+const isMatrixFunction = function (funcName) {
+  for (let f of functions) {
+    if (f.funcName == funcName) {
+      if (f.targets.includes('matrix'))
+        return true;
+      return false;
+    }
+  }
+  return false;
+}
+
+/**
+ * Controlla se la funzione 'funcName' è o meno applicabile agli scalari
+ * 
+ * @param {String} funcName Il nome della funzione da controllare
+ * @returns true se funcName è calcolabile su uno scalare, false altrimenti
+ */
+const isScalarFunction = function (funcName) {
+  for (let f of functions) {
+    if (f.funcName == funcName) {
+      if (f.targets.includes('scalar'))
+        return true;
+      return false;
+    }
   }
   return false;
 }
@@ -200,11 +248,21 @@ const resolveRPN = function (rpn) {
           resolveMatrixOperation(n1, n2, elem)
         );
       }
-      // TODO else if con caso matrice
-    } else if (isFunction(elem)) {} else
+    } else if (isFunction(elem)) {
+      if (n instanceof Matrix && !isMatrixFunction(elem))
+        throw `Impossibile calcolare la funzione '${elem}' su una matrice`;
+      if (!(n instanceof Matrix) && !isScalarFunction(elem))
+        throw `Impossibile calcolare la funzione '${elem}' su uno scalare`;
+      // Sintassi un po' particolare, ma poppa la cima dello stack e ci esegue la funzione col nome indicato in elem
+      stack.pop()[elem]();
+    } else
       stack.push(elem);
   }
   return stack.pop();
+}
+
+const executeMatrixFunction = function (matrix, funcName) {
+  return matrix[funcName]();
 }
 
 /**
