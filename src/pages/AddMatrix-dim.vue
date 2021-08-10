@@ -68,6 +68,13 @@ export default defineComponent({
         );
         return;
       }
+      if (this.name.includes("Ans")) {
+        errorDialog(
+          this,
+          "Il nome della matrice non può contenere la parola chiave 'Ans'"
+        );
+        return;
+      }
       this.rows = parseInt(this.rows);
       this.cols = parseInt(this.cols);
       this.$router.push({

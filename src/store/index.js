@@ -5,6 +5,8 @@ import {
   createStore
 } from 'vuex'
 import createPersistedState from "vuex-persistedstate";
+import Fraction from 'src/model/Fraction.js';
+import Matrix from 'src/model/Matrix.js';
 
 // import example from './module-example'
 
@@ -25,15 +27,27 @@ export default store(function ( /* { ssrContext } */ ) {
     },
     getters: {
       matrixes: state => state.matrixes,
+      Ans: state => state.ans,
+      MatAns: state => state.MatAns
     },
     mutations: {
       addMatrix(state, matrix) {
         state.matrixes.push(matrix);
       },
+      setMatAns(state, matrix) {
+        if (matrix instanceof Matrix)
+          state.matAns = matrix;
+      },
+      setAns(state, fraction) {
+        if (fraction instanceof Fraction)
+          state.ans = fraction;
+      },
     },
     actions: {},
     state: {
-      matrixes: []
+      matrixes: [],
+      matAns: null,
+      ans: null
     },
 
     // enable strict mode (adds overhead!)

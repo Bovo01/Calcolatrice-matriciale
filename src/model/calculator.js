@@ -188,13 +188,16 @@ const toRPN = function (arr, self) {
   for (let token of arr) {
     let lastOperatorStack = operatorStack[operatorStack.length - 1];
     if (token instanceof Fraction) {
-      // Se è una frazione
       outputStack.push(token);
+    } else if (token == "Ans") {
+      let temp = self.$store.getters.Ans;
+      outputStack.push(new Fraction(temp.num, temp.den));
     } else if (isMatrix(token, self)) {
-      // TODO Caso matrice
       outputStack.push(getMatrixFromName(token, self));
+    } else if (token == "MatAns") {
+      let temp = self.$store.getters.Ans;
+      outputStack.push(new Matrix(temp.rows, temp.cols, temp.matrix));
     } else if (isFunction(token)) {
-      // Se è una funzione
       operatorStack.push(token);
     } else if (isOperator(token)) {
       while (operatorStack.length && isOperator(lastOperatorStack) &&
@@ -252,8 +255,6 @@ const resolveRPN = function (rpn) {
       }
     } else if (isFunction(elem)) {
       let n = stack.pop();
-      console.log(n, elem)
-
       if (n instanceof Matrix && !isMatrixFunction(elem))
         throw `Impossibile calcolare la funzione '${elem}' su una matrice`;
       if (!(n instanceof Matrix) && !isScalarFunction(elem))

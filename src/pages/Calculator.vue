@@ -4,7 +4,7 @@
     <div class="row" style="position: relative">
       <input class="display" v-model="text" readonly />
       <span class="result" :class="{ hide: !displayResult }">
-        ={{ result }}
+        ={{ result.toString() }}
       </span>
     </div>
     <!-- Bottoni -->
@@ -14,6 +14,21 @@
         <!-- Dropdown VARS -->
         <q-btn-dropdown label="VARS">
           <q-list>
+            <!-- MatAns -->
+            <q-item clickable v-close-popup v-if="matAns != null">
+              <q-item-section>
+                <q-item-label @click="appendText('MatAns')">
+                  MatAns
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+            <!-- Ans -->
+            <q-item clickable v-close-popup v-if="ans != null">
+              <q-item-section>
+                <q-item-label @click="appendText('Ans')"> Ans </q-item-label>
+              </q-item-section>
+            </q-item>
+            <!-- Matrici salvate -->
             <q-item
               clickable
               v-close-popup
@@ -26,7 +41,8 @@
                 </q-item-label>
               </q-item-section>
             </q-item>
-            <q-item clickable v-close-popup>
+            <!-- Bottone aggiungi matrice -->
+            <q-item clickable v-close-popup style="color: lime">
               <q-item-section>
                 <q-item-label @click="addMatrix()">Add mat</q-item-label>
               </q-item-section>
@@ -102,6 +118,7 @@ import {
   functions,
 } from "src/model/calculator.js";
 import Fraction from "src/model/Fraction.js";
+import Matrix from "src/model/Matrix.js";
 import { errorDialog } from "src/model/Utilities";
 
 export default defineComponent({
@@ -112,8 +129,7 @@ export default defineComponent({
       parenthesis: 0,
       theme: 0,
       qtyThemes: 2,
-      ops: functions,
-      result: String,
+      result: "",
       displayResult: false,
     };
   },
@@ -123,6 +139,15 @@ export default defineComponent({
     },
     matrixes: function () {
       return this.$store.getters.matrixes;
+    },
+    ops: function () {
+      return functions;
+    },
+    matAns: function () {
+      return this.$store.getters.MatAns;
+    },
+    ans: function () {
+      return this.$store.getters.Ans;
     },
   },
   methods: {
@@ -146,7 +171,19 @@ export default defineComponent({
         this.operations.push("(");
         this.parenthesis++;
       } else if (isOperator(text)) {
-        if (isOperator(lastOperation))
+        if (this.operations.length == 0) {
+          console.log(this.result);
+          if (this.result instanceof Fraction) {
+            this.appendText("Ans");
+            this.operations.push(text);
+          } else if (!isNaN(this.result)) {
+            this.appendText("Ans");
+            //TODO Fai in modo che il risultato sia sempre frazione e mai intero
+          } else if (this.result instanceof Matrix) {
+            this.appendText("MatAns");
+            this.operations.push(text);
+          }
+        } else if (isOperator(lastOperation))
           this.operations[this.operations.length - 1] = text;
         else if (lastOperation != "(" && this.operations.length > 0)
           this.operations.push(text);
@@ -157,6 +194,13 @@ export default defineComponent({
         if (this.parenthesis > 0 && lastOperation != "(") {
           this.operations.push(text);
           this.parenthesis--;
+        }
+      } else if (text == "Ans" || text == "MatAns") {
+        if (
+          this.operations.length == 0 ||
+          (!isMatrix(lastOperation, this) && isNaN(lastOperation))
+        ) {
+          this.operations.push(text);
         }
       } else {
         this.operations.push(text);
@@ -219,12 +263,13 @@ export default defineComponent({
       try {
         let result = solve(operations, this);
         console.log(result);
-        /*this.$q.notify({
-          message: result.toString(),
-          position: "top",
-          color: "positive",
-        });*/
-        this.result = result.toString();
+        if (result instanceof Matrix) {
+          this.result = "MatAns";
+          this.$store.commit("setMatAns", result);
+        } else {
+          this.result = result;
+          this.$store.commit("setAns", result);
+        }
         this.displayResult = true;
       } catch (e) {
         errorDialog(this, e);
