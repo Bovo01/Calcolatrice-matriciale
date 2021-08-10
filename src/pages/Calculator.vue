@@ -229,9 +229,11 @@ export default defineComponent({
       }
     },
     clear() {
+      this.displayResult = false;
       this.operations = [];
     },
     backspace() {
+      this.displayResult = false;
       let lastOperation = this.operations[this.operations.length - 1];
       if (isNaN(lastOperation) || lastOperation.length <= 1) {
         if (lastOperation != "(") this.operations.pop();
