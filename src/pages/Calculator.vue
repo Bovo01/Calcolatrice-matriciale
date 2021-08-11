@@ -47,6 +47,12 @@
                 <q-item-label @click="addMatrix()">Add mat</q-item-label>
               </q-item-section>
             </q-item>
+            <!-- Bottone rimozione matrice -->
+            <q-item clickable v-close-popup style="color: red">
+              <q-item-section>
+                <q-item-label @click="removeMatrix()">Delete mat</q-item-label>
+              </q-item-section>
+            </q-item>
           </q-list>
         </q-btn-dropdown>
         <!-- Dropdown OPS -->
@@ -280,6 +286,9 @@ export default defineComponent({
     },
     addMatrix() {
       this.$router.push({ name: "Aggiungi dim matrice" });
+    },
+    removeMatrix() {
+      this.$router.push({ name: "Rimuovi matrice" });
     },
     toggleTheme() {
       this.theme = (this.theme + 1) % this.qtyThemes;

@@ -15,6 +15,12 @@ const routes = [{
     component: () => import('src/pages/AddMatrix-rows.vue'),
   },
 
+  {
+    name: "Rimuovi matrice",
+    path: '/remove-matrix',
+    component: () => import('src/pages/RemoveMatrix.vue'),
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {

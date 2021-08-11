@@ -34,6 +34,9 @@ export default store(function ( /* { ssrContext } */ ) {
       addMatrix(state, matrix) {
         state.matrixes.push(matrix);
       },
+      removeMatrixesFromName(state, matrixesNames) {
+        state.matrixes = state.matrixes.filter(mat => !matrixesNames.includes(mat.name));
+      },
       setMatAns(state, matrix) {
         if (matrix instanceof Matrix)
           state.matAns = matrix;
