@@ -14,18 +14,28 @@
         <!-- Dropdown VARS -->
         <q-btn-dropdown label="VARS">
           <q-list>
+            <!-- Ans -->
+            <q-item
+              clickable
+              v-close-popup
+              v-if="ans != null"
+              style="color: cyan"
+            >
+              <q-item-section>
+                <q-item-label @click="appendText('Ans')"> Ans </q-item-label>
+              </q-item-section>
+            </q-item>
             <!-- MatAns -->
-            <q-item clickable v-close-popup v-if="matAns != null">
+            <q-item
+              clickable
+              v-close-popup
+              v-if="matAns != null"
+              style="color: cyan"
+            >
               <q-item-section>
                 <q-item-label @click="appendText('MatAns')">
                   MatAns
                 </q-item-label>
-              </q-item-section>
-            </q-item>
-            <!-- Ans -->
-            <q-item clickable v-close-popup v-if="ans != null">
-              <q-item-section>
-                <q-item-label @click="appendText('Ans')"> Ans </q-item-label>
               </q-item-section>
             </q-item>
             <!-- Matrici salvate -->
@@ -41,7 +51,7 @@
                 </q-item-label>
               </q-item-section>
             </q-item>
-            <!-- Bottone aggiungi matrice -->
+            <!-- Bottone aggiunta matrice -->
             <q-item clickable v-close-popup style="color: lime">
               <q-item-section>
                 <q-item-label @click="addMatrix()">Add mat</q-item-label>

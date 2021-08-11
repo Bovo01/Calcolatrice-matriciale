@@ -141,8 +141,11 @@ export default class Fraction {
   pow(e) {
     if (e instanceof Fraction)
       if (e.den == 1)
-        return new Fraction(Math.pow(this.num, e.num), Math.pow(this.den, e.num));
-      else throw "L'esponente deve essere un numero intero";
+        if (e.num > 0)
+          return new Fraction(Math.pow(this.num, e.num), Math.pow(this.den, e.num));
+        else
+          return new Fraction(Math.pow(this.den, -e.num), Math.pow(this.num, -e.num));
+    else throw "L'esponente deve essere un numero intero";
     if (isNaN(e) || e !== parseInt(e)) throw "L'esponente deve essere un numero intero";
     if (e < 0)
       return new Fraction(Math.pow(this.den, -e), Math.pow(this.num, -e));
