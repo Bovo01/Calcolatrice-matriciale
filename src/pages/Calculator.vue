@@ -204,6 +204,9 @@ export default defineComponent({
         else if (lastOperation != "(" && this.operations.length > 0)
           this.operations.push(text);
       } else if (text == "(") {
+        if (!isNaN(lastOperation) || isMatrix(lastOperation, this)) {
+          this.operations.push("*");
+        }
         this.operations.push(text);
         this.parenthesis++;
       } else if (text == ")") {
