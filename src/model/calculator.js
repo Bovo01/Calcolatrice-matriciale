@@ -53,7 +53,7 @@ const getMatrixFromName = function (matrixName, self) {
  */
 const isMatrix = function (matrixName, self) {
   return (
-    self.$store.getters.matrixes.filter((mat) => mat.name == matrixName)
+    self.$store.getters.matrixes.filter(mat => mat.name == matrixName)
     .length > 0
   );
 }

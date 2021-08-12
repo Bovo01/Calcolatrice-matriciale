@@ -20,6 +20,7 @@
               v-close-popup
               v-if="ans != null"
               style="color: cyan"
+              :disable="state == 1 || state >= 5"
             >
               <q-item-section>
                 <q-item-label @click="appendText('Ans')"> Ans </q-item-label>
@@ -31,6 +32,7 @@
               v-close-popup
               v-if="matAns != null"
               style="color: cyan"
+              :disable="state == 1 || state >= 5"
             >
               <q-item-section>
                 <q-item-label @click="appendText('MatAns')">
@@ -44,9 +46,10 @@
               v-close-popup
               v-for="(matrix, index) in matrixes"
               v-bind:key="index"
+              :disable="state == 1 || state >= 5"
             >
               <q-item-section>
-                <q-item-label @click="appendMatrix(matrix)">
+                <q-item-label @click="appendText(matrix.name)">
                   {{ matrix.name }}
                 </q-item-label>
               </q-item-section>
@@ -73,9 +76,10 @@
               v-close-popup
               v-for="(operation, index) in ops"
               v-bind:key="index"
+              :disable="state == 1"
             >
               <q-item-section>
-                <q-item-label @click="appendFunction(operation)">
+                <q-item-label @click="appendText(operation.funcName)">
                   {{ operation.name }}
                 </q-item-label>
               </q-item-section>
@@ -83,41 +87,81 @@
           </q-list>
         </q-btn-dropdown>
         <q-btn>VIEW MAT</q-btn>
-        <q-btn @click="appendText('^')">^</q-btn>
+        <q-btn
+          @click="appendText('^')"
+          :disable="state == 0 || state == 2 || state == 6"
+        >
+          ^
+        </q-btn>
       </div>
-      <!-- Seconda riga (trash,BUBAH,backspace,/) -->
+      <!-- Seconda riga (trash,theme,backspace,/) -->
       <div class="row no-wrap">
-        <q-btn @click="clear()" icon="fas fa-trash" />
+        <q-btn
+          @click="clear()"
+          icon="fas fa-trash"
+          :disable="operations.length == 0"
+        />
         <q-btn @click="toggleTheme()">THEME</q-btn>
-        <q-btn @click="backspace()" icon="fas fa-backspace" />
-        <q-btn @click="appendText('/')" icon="fas fa-divide" />
+        <q-btn
+          @click="backspace()"
+          icon="fas fa-backspace"
+          :disable="operations.length == 0"
+        />
+        <q-btn
+          @click="appendText('/')"
+          icon="fas fa-divide"
+          :disable="state == 0 || state == 2 || state == 6"
+        />
       </div>
       <!-- Terza riga (7,8,9,*) -->
       <div class="row no-wrap">
-        <q-btn @click="appendText(7)">7</q-btn>
-        <q-btn @click="appendText(8)">8</q-btn>
-        <q-btn @click="appendText(9)">9</q-btn>
-        <q-btn @click="appendText('*')" icon="fas fa-times" />
+        <q-btn @click="appendText(7)" :disable="state >= 5">7</q-btn>
+        <q-btn @click="appendText(8)" :disable="state >= 5">8</q-btn>
+        <q-btn @click="appendText(9)" :disable="state >= 5">9</q-btn>
+        <q-btn
+          @click="appendText('*')"
+          icon="fas fa-times"
+          :disable="state == 0 || state == 2 || state == 6"
+        />
       </div>
       <!-- Quarta riga (4,5,6,-) -->
       <div class="row no-wrap">
-        <q-btn @click="appendText(4)">4</q-btn>
-        <q-btn @click="appendText(5)">5</q-btn>
-        <q-btn @click="appendText(6)">6</q-btn>
-        <q-btn @click="appendText('-')" icon="fas fa-minus" />
+        <q-btn @click="appendText(4)" :disable="state >= 5">4</q-btn>
+        <q-btn @click="appendText(5)" :disable="state >= 5">5</q-btn>
+        <q-btn @click="appendText(6)" :disable="state >= 5">6</q-btn>
+        <q-btn
+          @click="appendText('-')"
+          icon="fas fa-minus"
+          :disable="state == 2 || state == 6"
+        />
       </div>
       <!-- Quinta riga (1,2,3,+) -->
       <div class="row no-wrap">
-        <q-btn @click="appendText(1)">1</q-btn>
-        <q-btn @click="appendText(2)">2</q-btn>
-        <q-btn @click="appendText(3)">3</q-btn>
-        <q-btn @click="appendText('+')" icon="fas fa-plus" />
+        <q-btn @click="appendText(1)" :disable="state >= 5">1</q-btn>
+        <q-btn @click="appendText(2)" :disable="state >= 5">2</q-btn>
+        <q-btn @click="appendText(3)" :disable="state >= 5">3</q-btn>
+        <q-btn
+          @click="appendText('+')"
+          icon="fas fa-plus"
+          :disable="state == 0 || state == 2 || state == 6"
+        />
       </div>
       <!-- Sesta riga ((,0,),=) -->
       <div class="row no-wrap">
         <q-btn @click="appendText('(')">(</q-btn>
-        <q-btn @click="appendText(0)">0</q-btn>
-        <q-btn @click="appendText(')')">)</q-btn>
+        <q-btn @click="appendText(0)" :disable="state >= 5">0</q-btn>
+        <q-btn
+          @click="appendText(')')"
+          :disable="
+            parenthesis <= 0 ||
+            state == 0 ||
+            state == 2 ||
+            state == 3 ||
+            state == 6
+          "
+        >
+          )
+        </q-btn>
         <q-btn @click="solve()" icon="fas fa-equals" />
       </div>
     </div>
@@ -147,6 +191,7 @@ export default defineComponent({
       qtyThemes: 2,
       result: "",
       displayResult: false,
+      state: 0,
     };
   },
   computed: {
@@ -174,103 +219,101 @@ export default defineComponent({
       }
     },
     appendText(text) {
-      this.appendChecks();
-      text = String(text);
       let lastOperation = this.operations[this.operations.length - 1];
-      if (!isNaN(text) && !isNaN(lastOperation)) {
-        if (lastOperation.length < 16)
+      if (!isNaN(text)) {
+        if (this.state == 4) this.operations.push("*");
+        this.state = 1;
+        if (lastOperation && !isNaN(lastOperation) && lastOperation.length < 16)
           this.operations[this.operations.length - 1] = String(
             parseInt(lastOperation + text)
           );
-      } else if (isFunction(text)) {
+        else this.operations.push(String(text));
+      } else if (isMatrix(text, this)) {
+        if (this.state == 1 || this.state == 5) return;
         this.operations.push(text);
-        this.operations.push("(");
-        this.parenthesis++;
+        this.state = 5;
+      } else if (text.includes("Ans")) {
+        if (this.state == 1 || this.state == 5) return;
+        this.operations.push(text);
+        this.state = 5;
       } else if (isOperator(text)) {
-        if (this.operations.length == 0) {
-          console.log(this.result);
-          if (this.result instanceof Fraction) {
-            this.appendText("Ans");
-            this.operations.push(text);
-          } else if (!isNaN(this.result)) {
-            this.appendText("Ans");
-            //TODO Fai in modo che il risultato sia sempre frazione e mai intero
-          } else if (this.result instanceof Matrix) {
-            this.appendText("MatAns");
-            this.operations.push(text);
-          }
-        } else if (isOperator(lastOperation))
-          this.operations[this.operations.length - 1] = text;
-        else if (lastOperation != "(" && this.operations.length > 0)
+        if (this.state == 3) this.operations[this.operations.length - 1] = text;
+        else if (this.state != 0 && this.state != 2) {
           this.operations.push(text);
+          this.state = 3;
+        }
+        if (text == "-" && this.state == 0) {
+          this.state = 2;
+          this.operations.push(text);
+        }
       } else if (text == "(") {
-        if (!isNaN(lastOperation) || isMatrix(lastOperation, this)) {
+        if (this.state == 1 || this.state == 4 || this.state == 5)
           this.operations.push("*");
-        }
-        this.operations.push(text);
+        this.state = 0;
         this.parenthesis++;
-      } else if (text == ")") {
-        if (this.parenthesis > 0 && lastOperation != "(") {
-          this.operations.push(text);
-          this.parenthesis--;
-        }
-      } else if (text == "Ans" || text == "MatAns") {
-        if (
-          this.operations.length == 0 ||
-          (!isMatrix(lastOperation, this) && isNaN(lastOperation))
-        ) {
-          this.operations.push(text);
-        }
-      } else {
         this.operations.push(text);
-      }
-    },
-    appendFunction(operation) {
-      this.appendChecks();
-      let lastOperation = this.operations[this.operations.length - 1];
-      if (
-        this.operations.length == 0 ||
-        (isNaN(lastOperation) && !isMatrix(lastOperation, this))
-      ) {
-        this.operations.push(operation.funcName);
+      } else if (text == ")") {
+        this.state = 4;
+        this.operations.push(text);
+        this.parenthesis--;
+      } else if (isFunction(text)) {
+        if (this.state == 4 || this.state == 1) this.operations.push("*");
+        this.state = 0;
+        this.operations.push(text);
         this.operations.push("(");
         this.parenthesis++;
       }
     },
-    appendMatrix(matrix) {
-      this.appendChecks();
+    backspace() {
+      let removedOperation = this.operations.pop();
       let lastOperation = this.operations[this.operations.length - 1];
-      if (
-        this.operations.length == 0 ||
-        (!isMatrix(lastOperation, this) && isNaN(lastOperation))
+      // Condizione iniziale per numeri
+      if (!isNaN(removedOperation)) {
+        removedOperation = String(removedOperation);
+        if (removedOperation.length > 1) {
+          this.operations.push(
+            removedOperation.substring(0, removedOperation.length - 1)
+          );
+          lastOperation = this.operations[this.operations.length - 1];
+        }
+      }
+      if (removedOperation == "(") {
+        this.parenthesis--;
+      } else if (removedOperation == ")") {
+        this.parenthesis++;
+      }
+      if (lastOperation == undefined) {
+        this.state = 0;
+        return;
+      }
+      if (!isNaN(lastOperation)) {
+        this.state = 1;
+      } else if (isOperator(lastOperation)) {
+        this.state = 3;
+        if (lastOperation == "-") {
+          if (this.operations.length > 1) {
+            if (this.operations[this.operations.length - 2] == "(") {
+              this.state = 2;
+            }
+          } else this.state = 2;
+        }
+      } else if (
+        lastOperation.includes("Ans") ||
+        isMatrix(lastOperation, this)
       ) {
-        this.operations.push(matrix.name);
+        this.state = 5;
+      } else if (lastOperation == "(") {
+        this.state = 0;
+      } else if (lastOperation == ")") {
+        this.state = 4;
+      } else if (isFunction(lastOperation)) {
+        this.state = 6;
       }
     },
     clear() {
       this.displayResult = false;
       this.operations = [];
-    },
-    backspace() {
-      this.displayResult = false;
-      let lastOperation = this.operations[this.operations.length - 1];
-      if (isNaN(lastOperation) || lastOperation.length <= 1) {
-        if (lastOperation != "(") this.operations.pop();
-        else {
-          if (
-            this.operations.length > 1 &&
-            isFunction(this.operations[this.operations.length - 2])
-          ) {
-            this.operations.pop();
-          }
-          this.operations.pop();
-        }
-      } else {
-        this.operations[this.operations.length - 1] = lastOperation.substring(
-          0,
-          lastOperation.length - 1
-        );
-      }
+      this.state = 0;
     },
     solve() {
       if (this.operations.length < 1) return;
