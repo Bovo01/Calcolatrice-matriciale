@@ -326,7 +326,6 @@ export default defineComponent({
       }
       try {
         let result = solve(operations, this);
-        console.log(result);
         if (result instanceof Matrix) {
           this.result = "MatAns";
           this.$store.commit("setMatAns", result);

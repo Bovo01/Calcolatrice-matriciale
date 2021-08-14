@@ -39,7 +39,7 @@ export default store(function ( /* { ssrContext } */ ) {
       },
       setMatAns(state, matrix) {
         if (matrix instanceof Matrix)
-          state.matAns = matrix;
+          state.MatAns = matrix;
       },
       setAns(state, fraction) {
         if (fraction instanceof Fraction)

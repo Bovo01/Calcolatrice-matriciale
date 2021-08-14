@@ -195,8 +195,8 @@ const toRPN = function (arr, self) {
     } else if (isMatrix(token, self)) {
       outputStack.push(getMatrixFromName(token, self));
     } else if (token == "MatAns") {
-      let temp = self.$store.getters.Ans;
-      outputStack.push(new Matrix(temp.rows, temp.cols, temp.matrix));
+      let temp = self.$store.getters.MatAns;
+      outputStack.push(new Matrix(temp.rows, temp.cols, convertProxyToMatrix(temp.matrix)));
     } else if (isFunction(token)) {
       operatorStack.push(token);
     } else if (isOperator(token)) {
