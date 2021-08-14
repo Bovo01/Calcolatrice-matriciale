@@ -3,25 +3,41 @@
     <!-- Display con la grid -->
     <div class="display-grid">
       <div class="row no-wrap" v-for="(row, index) in matrix" :key="index">
-        <input
-          readonly
+        <div
           v-for="(fraction, jndex) in row"
           :key="jndex"
-          :value="
-            index == currentRow && jndex == currentCol
-              ? currentNumber.join('')
-              : fraction.toString()
-          "
-          class="matrix-element"
-          :class="{ selected: jndex == currentCol && index == currentRow }"
-          :style="{
-            transform: `translate(${
-              cols > 3 && currentCol >= 2 ? 137.5 - 112.5 * currentCol : 0
-            }%, ${
-              rows > 3 && currentRow >= 1 ? -10 - 130 * (currentRow - 1) : 0
-            }%)`,
-          }"
-        />
+          style="position: relative"
+        >
+          <input
+            readonly
+            :value="
+              index == currentRow && jndex == currentCol
+                ? currentNumber.join('')
+                : fraction.toString()
+            "
+            class="matrix-element"
+            :class="{ selected: jndex == currentCol && index == currentRow }"
+            :style="{
+              transform: `translate(${
+                cols > 3 && currentCol >= 2 ? 137.5 - 112.5 * currentCol : 0
+              }%, ${
+                rows > 3 && currentRow >= 1 ? -10 - 130 * (currentRow - 1) : 0
+              }%)`,
+            }"
+          />
+          <!-- DIV non visibile per l'onclick -->
+          <div
+            @click="switchRow(index, jndex)"
+            class="hidden-div"
+            :style="{
+              transform: `translate(${
+                cols > 3 && currentCol >= 2 ? 137.5 - 112.5 * currentCol : 0
+              }%, ${
+                rows > 3 && currentRow >= 1 ? -10 - 130 * (currentRow - 1) : 0
+              }%)`,
+            }"
+          />
+        </div>
       </div>
     </div>
     <!-- Tastierino numerico -->
@@ -91,6 +107,10 @@ export default defineComponent({
     };
   },
   methods: {
+    switchRow(i, j) {
+      this.currentRow = i;
+      this.currentCol = j;
+    },
     back() {
       this.$router.push({ name: "calculator" });
     },
@@ -239,7 +259,6 @@ export default defineComponent({
   height: 10vh;
   margin-left: 2.5vw;
   width: 20vw;
-  cursor: default;
   font-size: min(3vw, 3vh);
   text-align: center;
   z-index: -1;
@@ -258,5 +277,16 @@ export default defineComponent({
   border-radius: 7px;
   overflow: hidden;
   flex-flow: column wrap;
+}
+.hidden-div {
+  opacity: 0;
+  width: 20vw;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  margin-left: 2.5vw;
+  z-index: 1;
+  border-radius: 7px;
+  cursor: pointer;
 }
 </style>
