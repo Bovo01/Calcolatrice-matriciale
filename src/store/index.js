@@ -34,6 +34,16 @@ export default store(function ( /* { ssrContext } */ ) {
       addMatrix(state, matrix) {
         state.matrixes.push(matrix);
       },
+      /**
+       * Il payload contiene due proprietà:
+       * name - Il nome della matrice
+       * matrix - L'array che contiene la nuova matrice da sostituire a quella salvata
+       */
+      editMatrix(state, payload) {
+        let mat = state.matrixes.filter(m => m.name === payload.name);
+        if (mat.length == 0) throw "Matrice non trovata";
+        mat[0].matrix = payload.matrix;
+      },
       removeMatrixesFromName(state, matrixesNames) {
         state.matrixes = state.matrixes.filter(mat => !matrixesNames.includes(mat.name));
       },

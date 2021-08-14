@@ -16,6 +16,12 @@ const routes = [{
   },
 
   {
+    name: "Visualizza matrice",
+    path: '/view-matrix/:name',
+    component: () => import('src/pages/AddMatrix-rows.vue'),
+  },
+
+  {
     name: "Rimuovi matrice",
     path: '/remove-matrix',
     component: () => import('src/pages/RemoveMatrix.vue'),

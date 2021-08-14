@@ -80,7 +80,10 @@
         >
           NEXT
         </q-btn>
-        <q-btn v-else color="positive" @click="conferma()"> CONFERMA </q-btn>
+        <q-btn v-else-if="!viewMat" color="positive" @click="conferma()">
+          CONFERMA
+        </q-btn>
+        <q-btn v-else color="positive" @click="modifica()"> MODIFICA </q-btn>
       </div>
     </div>
   </div>
@@ -88,6 +91,7 @@
 
 <script>
 import { defineComponent } from "@vue/composition-api";
+import { isMatrix, getMatrixFromName } from "src/model/calculator.js";
 import {
   errorDialog,
   successDialog,
@@ -104,12 +108,15 @@ export default defineComponent({
       currentCol: 0,
       currentNumber: [0],
       matrix: Array,
+      viewMat: false,
     };
   },
   methods: {
     switchRow(i, j) {
+      this.pushInMatrix();
       this.currentRow = i;
       this.currentCol = j;
+      this.getFromMatrix();
     },
     back() {
       this.$router.push({ name: "calculator" });
@@ -209,20 +216,56 @@ export default defineComponent({
       );
       this.$router.push({ name: "calculator" });
     },
+    modifica() {
+      this.pushInMatrix();
+      console.log(this.$route.params.name);
+      this.$store.commit("editMatrix", {
+        name: this.$route.params.name,
+        matrix: convertProxyToMatrix(this.matrix),
+      });
+      successDialog(
+        this,
+        `La matrice '${this.$route.params.name}' è stata aggiornata`
+      );
+      this.$router.push({ name: "calculator" });
+    },
   },
   mounted() {
-    this.rows = this.$route.params.rows;
-    this.cols = this.$route.params.cols;
-    if (
-      this.rows == undefined ||
-      this.cols == undefined ||
-      this.rows <= 0 ||
-      this.cols <= 0
-    ) {
-      this.$router.push({ name: "Aggiungi dim matrice" });
-      return;
+    this.viewMat = this.$route.params.viewMat;
+    if (this.viewMat) {
+      if (
+        !isMatrix(this.$route.params.name, this) &&
+        this.$route.params.name != "MatAns"
+      ) {
+        this.$router.push({ name: "calculator" });
+        return;
+      }
+      let mat;
+      if (this.$route.params.name == "MatAns") mat = this.$store.getters.MatAns;
+      else mat = getMatrixFromName(this.$route.params.name, this);
+      this.rows = mat.rows;
+      this.cols = mat.cols;
+      this.matrix = mat.matrix;
+      let firstElem = mat.matrix[0][0];
+      this.currentNumber = [firstElem.num];
+      if (firstElem.den != 1) {
+        this.currentNumber.push("/");
+        this.currentNumber.push(firstElem.den);
+      }
+    } else {
+      this.rows = this.$route.params.rows;
+      this.cols = this.$route.params.cols;
+      if (
+        this.rows == undefined ||
+        this.cols == undefined ||
+        this.rows <= 0 ||
+        this.cols <= 0
+      ) {
+        this.$router.push({ name: "Aggiungi dim matrice" });
+        return;
+      }
+      this.initializeMatrix();
     }
-    this.initializeMatrix();
   },
 });
 </script>

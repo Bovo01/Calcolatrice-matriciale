@@ -373,5 +373,6 @@ export {
   isOperator,
   isMatrix,
   functions,
-  solve
+  solve,
+  getMatrixFromName
 };

@@ -86,7 +86,36 @@
             </q-item>
           </q-list>
         </q-btn-dropdown>
-        <q-btn>VIEW MAT</q-btn>
+        <!-- Dropdown VIEW MAT -->
+        <q-btn-dropdown label="VIEW MAT">
+          <q-list>
+            <!-- MatAns -->
+            <q-item
+              clickable
+              v-close-popup
+              v-if="matAns != null"
+              style="color: cyan"
+            >
+              <q-item-section>
+                <q-item-label @click="viewMat('MatAns')"> MatAns </q-item-label>
+              </q-item-section>
+            </q-item>
+            <!-- Matrici salvate -->
+            <q-item
+              clickable
+              v-close-popup
+              v-for="(matrix, index) in matrixes"
+              v-bind:key="index"
+              :disable="state == 1 || state >= 5"
+            >
+              <q-item-section>
+                <q-item-label @click="viewMat(matrix.name)">
+                  {{ matrix.name }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
         <q-btn
           @click="appendText('^')"
           :disable="state == 0 || state == 2 || state == 6"
@@ -347,6 +376,15 @@ export default defineComponent({
     },
     toggleTheme() {
       this.theme = (this.theme + 1) % this.qtyThemes;
+    },
+    viewMat(matName) {
+      this.$router.push({
+        name: "Visualizza matrice",
+        params: {
+          name: matName,
+          viewMat: true,
+        },
+      });
     },
   },
   mounted() {},
