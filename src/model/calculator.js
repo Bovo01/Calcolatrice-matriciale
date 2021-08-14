@@ -41,7 +41,7 @@ const functions = [{
 const getMatrixFromName = function (matrixName, self) {
   let temp = self.$store.getters.matrixes.filter((mat) => mat.name == matrixName);
   if (temp.length == 0) throw "Non esiste una matrice con il nome inserito";
-  return new Matrix(temp[0].matrix.rows, temp[0].matrix.cols, convertProxyToMatrix(temp[0].matrix.matrix));
+  return new Matrix(temp[0].rows, temp[0].cols, convertProxyToMatrix(temp[0].matrix));
 }
 
 /**
@@ -275,7 +275,39 @@ const resolveRPN = function (rpn) {
  * @returns Una frazione o una matrice risultante dell'espressione
  */
 const solve = function (expression, self) {
-  return resolveRPN(toRPN(expression, self));
+  return resolveRPN(toRPN(makeBasicExpressionReadable(expression, self), self));
+}
+
+/**
+ * Rende leggibile all'rpn l'espressione
+ * 
+ * @param {Array} expression L'espressione con tutti gli elementi separati come array
+ * @param {Object} self Riferimento all'oggetto Vue
+ * @returns Una nuova espressione leggibile dall'rpn
+ */
+const makeBasicExpressionReadable = function (expression, self) {
+  let newExpression = [];
+  let lastOperation = null,
+    prevOperation = null;
+  for (let i = 0; i < expression.length; i++) {
+    let token = expression[i];
+    if (lastOperation && lastOperation == "-" && (prevOperation == null || prevOperation == "(")) {
+      newExpression.pop();
+      if (token instanceof Fraction) {
+        newExpression.push(token.opposite());
+      } else if (isMatrix(token, self)) {
+        newExpression.push(new Fraction(-1));
+        newExpression.push("*");
+        newExpression.push(token);
+      }
+    } else {
+      newExpression.push(token);
+    }
+    prevOperation = lastOperation;
+    lastOperation = token;
+  }
+  console.log(newExpression)
+  return newExpression;
 }
 
 /**
