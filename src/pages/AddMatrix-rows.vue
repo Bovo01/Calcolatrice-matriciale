@@ -64,14 +64,9 @@
       </div>
       <!-- Quarta riga (PREV,0,NEXT) -->
       <div class="row no-wrap">
-        <q-btn
-          @click="prev()"
-          :disable="currentRow == 0 && currentCol == 0"
-          v-if="currentRow != 0 || currentCol != 0"
-        >
+        <q-btn @click="prev()" :disable="currentRow == 0 && currentCol == 0">
           PREV
         </q-btn>
-        <q-btn v-else color="negative" @click="back()">ANNULLA</q-btn>
         <q-btn @click="appendText(0)">0</q-btn>
         <q-btn
           @click="next()"
@@ -84,6 +79,7 @@
           CONFERMA
         </q-btn>
         <q-btn v-else color="positive" @click="modifica()"> MODIFICA </q-btn>
+        <q-btn color="negative" @click="back()">ANNULLA</q-btn>
       </div>
     </div>
   </div>
@@ -218,7 +214,6 @@ export default defineComponent({
     },
     modifica() {
       this.pushInMatrix();
-      console.log(this.$route.params.name);
       this.$store.commit("editMatrix", {
         name: this.$route.params.name,
         matrix: convertProxyToMatrix(this.matrix),
@@ -276,7 +271,7 @@ export default defineComponent({
 }
 .row.no-wrap .q-btn {
   height: 8.6vh;
-  width: 17vw;
+  width: 16vw;
   margin-right: 4vw;
   font-weight: bold;
   font-size: min(3vw, 3vh);

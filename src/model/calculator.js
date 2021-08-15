@@ -306,7 +306,6 @@ const makeBasicExpressionReadable = function (expression, self) {
     prevOperation = lastOperation;
     lastOperation = token;
   }
-  console.log(newExpression)
   return newExpression;
 }
 
