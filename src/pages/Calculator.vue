@@ -248,6 +248,7 @@ export default defineComponent({
       }
     },
     appendText(text) {
+      this.appendChecks();
       let lastOperation = this.operations[this.operations.length - 1];
       if (!isNaN(text)) {
         if (this.state == 4) this.operations.push("*");
@@ -363,9 +364,13 @@ export default defineComponent({
           this.$store.commit("setAns", result);
         }
         this.displayResult = true;
+        this.state = 0;
       } catch (e) {
-        errorDialog(this, e);
-        console.error(e);
+        if (typeof e == "string") errorDialog(this, e);
+        else {
+          errorDialog(this, "Errore mio, scusa non so programmare");
+          console.error(e);
+        }
       }
     },
     addMatrix() {
