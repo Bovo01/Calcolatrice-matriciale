@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <!-- Display con la grid -->
+    <!-- TODO Migliorare la visualizzazione delle frazioni (come frazioni vere e non in riga) -->
     <div class="display-grid">
       <div class="row no-wrap" v-for="(row, index) in matrix" :key="index">
         <div
@@ -242,10 +243,10 @@ export default defineComponent({
       this.cols = mat.cols;
       this.matrix = mat.matrix;
       let firstElem = mat.matrix[0][0];
-      this.currentNumber = [firstElem.num];
+      this.currentNumber = [String(firstElem.num)];
       if (firstElem.den != 1) {
-        this.currentNumber.push("/");
-        this.currentNumber.push(firstElem.den);
+        this.setFraction();
+        this.currentNumber.push(String(firstElem.den));
       }
     } else {
       this.rows = this.$route.params.rows;
